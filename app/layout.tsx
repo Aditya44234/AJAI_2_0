@@ -11,24 +11,23 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: 'AJAI 2.0 - AI Chat Assistant',
   description: 'Your intelligent AI assistant powered by advanced language models',
-  // generator: 'v0.app',
-  // icons: {
-  //   icon: [
-  //     {
-  //       url: '/icon-light-32x32.png',
-  //       media: '(prefers-color-scheme: light)',
-  //     },
-  //     {
-  //       url: '/icon-dark-32x32.png',
-  //       media: '(prefers-color-scheme: dark)',
-  //     },
-  //     {
-  //       url: '/icon.svg',
-  //       type: 'image/svg+xml',
-  //     },
-  //   ],
-  //   apple: '/apple-icon.png',
-  // },
+  icons: {
+    icon: [
+      {
+        url: '/icon.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/icon.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+    apple: '/icon.png',
+  },
 }
 
 export const viewport: Viewport = {
