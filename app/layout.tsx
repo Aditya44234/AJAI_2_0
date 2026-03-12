@@ -10,7 +10,7 @@ import './globals.css'
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: 'AJAI 2.0 - AI Chat Assistant',
+  title: 'AJAI 2.0',
   description: 'Your intelligent AI assistant powered by advanced language models',
   icons: {
     icon: [

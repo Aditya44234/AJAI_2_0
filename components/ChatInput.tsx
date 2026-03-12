@@ -117,9 +117,9 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           />
 
           {/* Personality button */}
-          <button className="text-base text-muted-foreground hover:text-foreground transition">
+          {/* <button className="text-base text-muted-foreground hover:text-foreground transition">
             Personality
-          </button>
+          </button> */}
 
           {/* Send Button */}
           <button
