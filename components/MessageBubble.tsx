@@ -41,6 +41,7 @@
 
 import { cn } from "@/lib/utils";
 import type { Message } from "@/types/chat";
+import ReactMarkdown from "react-markdown";
 
 interface MessageBubbleProps {
   message: Message;
@@ -79,7 +80,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               ],
         )}
       >
-        <p className="whitespace-pre-wrap break-words ">{message.content}</p>
+        {/* <p className="whitespace-pre-wrap break-words ">{message.content}</p> */}
+        <div className="whitespace-pre-wrap break-words">
+          <ReactMarkdown>{message.content}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );

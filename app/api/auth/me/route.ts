@@ -10,10 +10,11 @@ export async function OPTIONS() {
 
 export async function GET() {
     try {
-        const user = getAuthUser();
-        return NextResponse.json({ user,
-             headers: corsHeaders()
-         });
+        const user = await getAuthUser();
+        return NextResponse.json({
+            user,
+            headers: corsHeaders()
+        });
     } catch (error) {
         return NextResponse.json(
             { message: "Unauthorized" },

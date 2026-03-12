@@ -4,6 +4,6 @@ export function generateChatTitle(message: string): string {
     const cleaned = message.trim().replace(/\s+/g, " ");
 
     return cleaned.length > 40
-        ? cleaned.substring(0, 40) + "..."
+        ? cleaned.substring(0, 20) + "..."
         : cleaned;
 }

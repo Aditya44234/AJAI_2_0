@@ -1,3 +1,6 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Quantico:wght@200..900&display=swap');
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -39,6 +42,12 @@
   --sidebar-border: oklch(0.25 0.02 50);
   --sidebar-ring: oklch(0.55 0.10 55);
 }
+
+body {
+  /* font-family: 'Oxanium', sans-serif; */
+  font-family: 'Quantico', sans-serif;
+}
+
 
 .dark {
   --background: oklch(0.18 0.02 50);
@@ -120,7 +129,42 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+  background: transparent;
+}
+
+.chat-scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chat-scroll-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.chat-input-textarea {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chat-input-textarea::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }

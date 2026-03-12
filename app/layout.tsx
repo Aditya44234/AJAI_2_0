@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/context/AuthContext'
 import { ChatProvider } from '@/context/ChatContext'
 import { UIProvider } from '@/context/UIContext'
+import { UnhandledRejectionGuard } from '@/components/UnhandledRejectionGuard'
 import './globals.css'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -44,6 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} font-sans antialiased`}>
+        <UnhandledRejectionGuard />
         <AuthProvider>
           <UIProvider>
             <ChatProvider>

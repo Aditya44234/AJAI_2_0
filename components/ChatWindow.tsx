@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { useChat } from "@/context/ChatContext";
 import { useUI } from "@/context/UIContext";
+import { Menu } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
-import { ChatInput } from "./ChatInput";
-import { Bot, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export function ChatWindow() {
   const { messages, isSending, sendMessage } = useChat();
@@ -17,7 +17,11 @@ export function ChatWindow() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, [messages, isSending]);
 
@@ -31,9 +35,9 @@ export function ChatWindow() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="relative flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm">
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm bg-sidebar">
         <Button
           variant="ghost"
           size="icon"
@@ -58,7 +62,10 @@ export function ChatWindow() {
       </header>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        ref={scrollRef}
+        className="chat-scroll-container flex-1 overflow-y-auto p-4 pb-40 space-y-4"
+      >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <div className="w-46 h-46 rounded-full  flex items-center justify-center mb-4">
@@ -68,7 +75,7 @@ export function ChatWindow() {
             <h2 className="text-lg font-semibold mb-2">Welcome to AJAI 2.0</h2>
             <p className="text-sm text-muted-foreground max-w-sm">
               Start a conversation with your AI assistant. Ask anything and get
-              intelligent responses powered by advanced AI.
+              intelligent responses.
             </p>
           </div>
         ) : (

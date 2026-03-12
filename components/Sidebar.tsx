@@ -18,12 +18,22 @@ export function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUI();
 
   useEffect(() => {
-    loadChatList();
+    void loadChatList().catch(() => {
+      // Leave the sidebar empty if chat history cannot be loaded.
+    });
   }, [loadChatList]);
 
   const handleChatClick = (chatId: string) => {
-    loadChat(chatId);
+    void loadChat(chatId).catch(() => {
+      // Ignore chat load failures here to avoid unhandled promise rejections.
+    });
     setSidebarOpen(false);
+  };
+
+  const handleLogout = () => {
+    void logout().catch(() => {
+      // Keep the current UI state if logout fails.
+    });
   };
 
   const handleNewChat = () => {
@@ -51,7 +61,10 @@ export function Sidebar() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 ">
           <div className="flex items-center gap-2">
-            <div className="w-18 h-10 rounded-lg  flex items-center justify-center">
+            <div
+              className="w-18 h-10 rounded-lg  flex items-center justify-center cursor-pointer"
+              onClick={handleNewChat}
+            >
               {/* <Bot className="w-4 h-4 text-primary-foreground" /> */}
               <img src="/logo.png" alt="" />
             </div>
@@ -71,10 +84,10 @@ export function Sidebar() {
         </div>
 
         {/* New Chat Button */}
-        <div className="p-3">
+        <div className="p-3 cursor-pointer">
           <Button
             onClick={handleNewChat}
-            className="w-full justify-start gap-2"
+            className="w-full justify-start gap-2 cursor-pointer "
             variant="outline"
           >
             <Plus className="w-4 h-4" />
@@ -93,7 +106,7 @@ export function Sidebar() {
             </span>
           </div>
           <ScrollArea className="h-full px-3">
-            <div className="space-y-1 pb-4">
+            <div className="space-y-1 pb-4 ">
               {chatList.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8 px-2">
                   No chats yet. Start a new conversation!
@@ -104,7 +117,7 @@ export function Sidebar() {
                     key={chat.chatId}
                     onClick={() => handleChatClick(chat.chatId)}
                     className={cn(
-                      "w-full flex items-start gap-2 p-2 rounded-lg text-left text-sm transition-colors hover:bg-sidebar-accent",
+                      "w-full flex items-start gap-2 p-2 rounded-lg text-left text-sm transition-colors hover:bg-sidebar-accent cursor-pointer",
                       currentChatId === chat.chatId && "bg-sidebar-accent",
                     )}
                   >
@@ -151,8 +164,8 @@ export function Sidebar() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={logout}
-                className="text-sidebar-foreground"
+                onClick={handleLogout}
+                className="text-sidebar-foreground  cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="sr-only">Logout</span>

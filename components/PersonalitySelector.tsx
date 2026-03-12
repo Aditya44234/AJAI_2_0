@@ -17,6 +17,7 @@ const personalities: { value: Personality; label: string }[] = [
   { value: "hopeful", label: "Hopeful" },
   { value: "rude", label: "Rude" },
   { value: "aggressive", label: "Aggressive" },
+  { value: "mentor",label:"Mentor"},
 ]
 
 export function PersonalitySelector() {
@@ -25,16 +26,16 @@ export function PersonalitySelector() {
   return (
     <div className="px-3">
       <label className="flex items-center gap-2 text-xs text-muted-foreground mb-2 px-1">
-        <Sparkles className="w-3 h-3" />
+        {/* <Sparkles className="w-3 h-3" /> */}
         AI Personality
       </label>
-      <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)}>
-        <SelectTrigger className="w-full bg-sidebar-accent/50 border-sidebar-border">
+      <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)} >
+        <SelectTrigger className="w-full bg-sidebar-accent/50 border-sidebar-border cursor-pointer py-6 ">
           <SelectValue placeholder="Select personality" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent >
           {personalities.map((p) => (
-            <SelectItem key={p.value} value={p.value}>
+            <SelectItem key={p.value} value={p.value} className="cursor-pointer">
               {p.label}
             </SelectItem>
           ))}

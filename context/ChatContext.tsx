@@ -24,8 +24,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSending, setIsSending] = useState(false)
-
-  const loadChatList = useCallback(async () => {
+ const loadChatList = useCallback(async () => {
     const chats = await api.getChatList()
     setChatList(chats)
   }, [])
@@ -50,6 +49,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setIsSending(true)
 
     try {
+      console.log("Personality : ",personality)
       const response = await api.sendMessage(content, currentChatId || undefined, personality)
       
       // Update chatId if this is a new chat
