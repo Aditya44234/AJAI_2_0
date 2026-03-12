@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Plus, MessageSquare, LogOut, LogIn, X, Bot } from "lucide-react";
+
 import Link from "next/link";
 
 export function Sidebar() {
@@ -84,14 +85,15 @@ export function Sidebar() {
         </div>
 
         {/* New Chat Button */}
-        <div className="p-3 cursor-pointer">
+        <div className="p-3 cursor-pointer ">
           <Button
             onClick={handleNewChat}
-            className="w-full justify-start gap-2 cursor-pointer "
+            className="w-full flex  justify-between  gap-2 cursor-pointer border-4"
             variant="outline"
           >
             <Plus className="w-4 h-4" />
             New Chat
+            <Plus className="w-4 h-4" />
           </Button>
         </div>
 
@@ -117,7 +119,7 @@ export function Sidebar() {
                     key={chat.chatId}
                     onClick={() => handleChatClick(chat.chatId)}
                     className={cn(
-                      "w-full flex items-start gap-2 p-2 rounded-lg text-left text-sm transition-colors hover:bg-sidebar-accent cursor-pointer",
+                      "w-full flex items-start gap-2 p-2 rounded-lg text-left text-sm transition-colors hover:bg-sidebar-accent cursor-pointer border-b-2 ",
                       currentChatId === chat.chatId && "bg-sidebar-accent",
                     )}
                   >
@@ -128,7 +130,7 @@ export function Sidebar() {
                       </p>
                       {chat.lastMessage && (
                         <p className="text-xs text-muted-foreground truncate">
-                          {chat.lastMessage}
+                          {chat.lastMessage.slice(0, 25)}.........
                         </p>
                       )}
                     </div>
@@ -173,7 +175,9 @@ export function Sidebar() {
             </div>
           ) : (
             <Link href="/login">
-              <Button variant="outline" className="w-full justify-start gap-2">
+              <Button variant="outline" className="w-full justify-start gap-2 cursor-pointer
+              
+              ">
                 <LogIn className="w-4 h-4" />
                 Login / Register
               </Button>

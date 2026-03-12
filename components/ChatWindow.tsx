@@ -1,19 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatContext";
 import { useUI } from "@/context/UIContext";
-import { Menu } from "lucide-react";
+import { LogIn, Menu } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
+import { UserProfileModal } from "./UserProfileModal";
 
 export function ChatWindow() {
   const { messages, isSending, sendMessage } = useChat();
   const { personality, toggleSidebar } = useUI();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -59,6 +64,29 @@ export function ChatWindow() {
             </p>
           </div>
         </div>
+        <div className="ml-auto flex items-center">
+          {user ? (
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/30 bg-primary text-sm font-semibold uppercase text-primary-foreground shadow-sm transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-sidebar sm:h-11 sm:w-11 cursor-pointer
+              "
+              aria-label="Open user profile"
+            >
+              <span className="sr-only">{user.name}</span>
+              <div className="flex h-full w-full items-center justify-center rounded-full">
+                {user.name.slice(0, 1)}
+              </div>
+            </button>
+          ) : (
+            <Link href="/login">
+              <Button variant="outline" className="gap-2 cursor-pointer">
+                <LogIn className="h-4 w-4" />
+                Login
+              </Button>
+            </Link>
+          )}
+        </div>
       </header>
 
       {/* Messages */}
@@ -97,6 +125,15 @@ export function ChatWindow() {
 
       {/* Input */}
       <ChatInput onSend={handleSend} disabled={isSending} />
+
+      {user && (
+        <UserProfileModal
+          open={isProfileOpen}
+          onOpenChange={setIsProfileOpen}
+          user={user}
+          personality={personality}
+        />
+      )}
     </div>
   );
 }
