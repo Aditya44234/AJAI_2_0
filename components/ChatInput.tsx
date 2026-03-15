@@ -102,7 +102,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
 
   return (
     <div className="absolute inset-x-0 bottom-6 flex justify-center px-4 md:px-8">
-      <div className="w-full max-w-5xl rounded-[2rem] border border-border bg-card/80 backdrop-blur-md shadow-xl">
+      <div className="w-full max-w-5xl rounded-md border border-border bg-card/80 backdrop-blur-md shadow-xl">
         <div className="flex items-end gap-4 px-6 py-4">
           {/* Textarea */}
           <textarea

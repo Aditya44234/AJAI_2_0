@@ -103,9 +103,8 @@ export function ChatWindow() {
           <Menu className="w-5 h-5" />
           <span className="sr-only">Toggle sidebar</span>
         </Button>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <div className="w-20 h-13 rounded-full flex items-center justify-center">
-            {/* <Bot className="w-4 h-4 text-primary-foreground" /> */}
             <img src="/logo.png" alt="" />
           </div>
           <div>
@@ -114,7 +113,7 @@ export function ChatWindow() {
               {personality} mode
             </p>
           </div>
-        </div>
+        </div> */}
         <div className="ml-auto flex items-center">
           {user ? (
             <button
@@ -143,10 +142,10 @@ export function ChatWindow() {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="chat-scroll-container flex-1 overflow-y-auto p-4 pb-40 space-y-4"
+        className="chat-scroll-container flex-1 overflow-y-auto  pb-40 space-y-4  w-full max-w-5xl justify-center m-auto py-2"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4 animate-fade-in-up">
+          <div className="flex flex-col items-center  h-full text-center px-4 animate-fade-in-up">
             <div className="w-3xs h-46 rounded-full flex items-center justify-center mb-4 animate-bounce-slow">
               <img src="/logo.png" alt="" />
             </div>
@@ -164,7 +163,7 @@ export function ChatWindow() {
             {messages.map((msg, i) => (
               <div
                 key={`${msg.createdAt}-${i}`}
-                className={`animate-slide-in-right ${
+                className={`animate-slide-in-right justify-center  ${
                   animateFromSidebar ? "opacity-100" : "opacity-100"
                 }`}
               >

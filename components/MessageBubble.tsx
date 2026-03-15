@@ -53,34 +53,33 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div
       className={cn(
-        "flex w-full gap-3",
+        "flex w-full gap-3   ",
         isUser ? "justify-end" : "justify-start",
       )}
     >
       <div
         className={cn(
-          "relative max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed transition-all duration-300",
+          "relative max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed transition-all duration-300",
           isUser
-            ? "bg-primary text-primary-foreground rounded-br-md"
-            : "bg-card text-card-foreground rounded-bl-md border border-border animate-message-pulse",
+            ? "bg-card text-white rounded-br-md"
+            : " text-card-foreground rounded-bl-md animate-message-pulse",
           // base pseudo element
           "before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2",
-          isUser
-            ? [
-                // user tail on right
-                "before:right-[-6px]",
-                "before:border-y-[8px] before:border-l-[8px] before:border-y-transparent before:border-l-primary before:border-r-0",
-              ]
-            : [
-                // bot tail on left
-                "before:left-[-6px]",
-                "before:border-y-[8px] before:border-r-[8px] before:border-y-transparent before:border-r-card before:border-l-0",
-                // add border color match for the tail edge
-                "after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:left-[-7px] after:border-y-[9px] after:border-r-[9px] after:border-y-transparent after:border-r-border after:border-l-0",
-              ],
+          // isUser
+          //   ? [
+          //       // user tail on right
+          //       "before:right-[-6px]",
+          //       "before:border-y-[8px] before:border-l-[8px] before:border-y-transparent before:border-l-primary before:border-r-0",
+          //     ]
+          //   : [
+          //       // bot tail on left
+          //       "before:left-[-6px]",
+          //       "before:border-y-[8px] before:border-r-[8px] before:border-y-transparent before:border-r-card before:border-l-0",
+          //       "after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:left-[-7px] after:border-y-[9px] after:border-r-[9px] after:border-y-transparent after:border-r-border after:border-l-0",
+          //     ],
         )}
       >
-        <div className="whitespace-pre-wrap break-words ">
+        <div className="whitespace-pre-wrap break-words text-xl">
           <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
       </div>

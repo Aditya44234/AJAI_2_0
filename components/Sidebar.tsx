@@ -84,13 +84,13 @@ export function Sidebar() {
         <div className="flex items-center justify-between p-4 ">
           <div className="flex items-center gap-2">
             <div
-              className="w-18 h-10 rounded-lg  flex items-center justify-center cursor-pointer"
+              className="w-20 h-15 rounded-lg  flex items-center justify-center cursor-pointer"
               onClick={handleNewChat}
             >
               {/* <Bot className="w-4 h-4 text-primary-foreground" /> */}
               <img src="/logo.png" alt="" />
             </div>
-            <span className="font-semibold text-sidebar-foreground">
+            <span className="font-semibold text-sidebar-foreground text-2xl">
               AJAI 2.0
             </span>
           </div>
@@ -140,7 +140,7 @@ export function Sidebar() {
                   <div
                     key={chat.chatId}
                     className={cn(
-                      "relative w-full rounded-lg border-b-4 border-l-4   bg-card transition-all overflow-visible flex items-center justify-between cursor-pointer  hover:bg-sidebar-accent ",
+                      "relative w-full rounded-lg border-t-4   bg-card transition-all overflow-visible flex items-center justify-between cursor-pointer  hover:bg-sidebar-accent ",
                       currentChatId === chat.chatId
                         ? "bg-sidebar-accent"
                         : "bg-sidebar",
