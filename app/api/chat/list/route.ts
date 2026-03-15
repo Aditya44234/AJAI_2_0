@@ -35,7 +35,7 @@ export async function GET() {
         const chats = await Chat.find(
             isTemp ? { tempId: userId } : { userId }
         )
-            .sort({ lastMessageAt: -1 })
+            .sort({pinned:-1, lastMessageAt: -1 })
             .lean()
 
 
@@ -50,6 +50,7 @@ export async function GET() {
                     title: chat.title,
                     createdAt: chat.createdAt,
                     lastMessage: lastMessage?.content || "",
+                    pinned:chat.pinned,
                     headers: corsHeaders()
                 };
             })

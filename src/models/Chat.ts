@@ -9,6 +9,7 @@ export interface IChat {
     title: string;
     createdAt: Date;
     lastMessageAt: Date;
+    pinned?: boolean;
 }
 
 const ChatSchema = new Schema<IChat>(
@@ -33,6 +34,7 @@ const ChatSchema = new Schema<IChat>(
             default: Date.now,
             index: true,
         },
+        pinned: { type: Boolean, default: false, index: true },
     },
     { timestamps: true }
 );

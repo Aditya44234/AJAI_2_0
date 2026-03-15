@@ -9,6 +9,7 @@ export interface Chat {
   title: string
   createdAt: string
   lastMessage?: string
+  pinned?:boolean
 }
 
 export interface ChatDetails {
@@ -17,7 +18,7 @@ export interface ChatDetails {
   messages: Message[]
 }
 
-export type Personality = "default" | "rude" | "hopeful" | "aggressive" | "happy" |"mentor"
+export type Personality = "default" | "rude" | "hopeful" | "aggressive" | "happy" |"mentor"|"cotive"
 
 export interface SendMessageResponse {
   chatId: string

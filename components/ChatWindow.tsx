@@ -18,7 +18,58 @@ export function ChatWindow() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showWelcomeTyping, setShowWelcomeTyping] = useState(true);
+  const [typedTitle, setTypedTitle] = useState("");
+  const [typedDescription, setTypedDescription] = useState("");
+  const [animateFromSidebar, setAnimateFromSidebar] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      setShowWelcomeTyping(true);
+      setTypedTitle("");
+      setTypedDescription("");
+    } else {
+      setShowWelcomeTyping(false);
+      setTypedTitle("");
+      setTypedDescription("");
+    }
+  }, [messages.length]);
+
+  useEffect(() => {
+    if (!showWelcomeTyping) return;
+
+    const title = "Welcome to AJAI 2.0";
+    const description =
+      "Start a conversation with your AI assistant. Ask anything and get intelligent responses.";
+
+    let titleIndex = 0;
+    let descriptionIndex = 0;
+    const titleTimer = setInterval(() => {
+      titleIndex += 1;
+      setTypedTitle(title.slice(0, titleIndex));
+      if (titleIndex >= title.length) {
+        clearInterval(titleTimer);
+        const descTimer = setInterval(() => {
+          descriptionIndex += 1;
+          setTypedDescription(description.slice(0, descriptionIndex));
+          if (descriptionIndex >= description.length) {
+            clearInterval(descTimer);
+          }
+        }, 16);
+      }
+    }, 35);
+
+    return () => {
+      clearInterval(titleTimer);
+    };
+  }, [showWelcomeTyping]);
+
+  useEffect(() => {
+    setAnimateFromSidebar(true);
+    const timeout = setTimeout(() => setAnimateFromSidebar(false), 450);
+    return () => clearTimeout(timeout);
+  }, [messages.length]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -42,7 +93,7 @@ export function ChatWindow() {
   return (
     <div className="relative flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm bg-sidebar">
+      <header className="flex items-center gap-3 px-4 py-3  border-border bg-card/50 backdrop-blur-sm bg-sidebar">
         <Button
           variant="ghost"
           size="icon"
@@ -95,21 +146,30 @@ export function ChatWindow() {
         className="chat-scroll-container flex-1 overflow-y-auto p-4 pb-40 space-y-4"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="w-46 h-46 rounded-full  flex items-center justify-center mb-4">
-              {/* <Bot className="w-8 h-8 text-primary" /> */}
+          <div className="flex flex-col items-center justify-center h-full text-center px-4 animate-fade-in-up">
+            <div className="w-3xs h-46 rounded-full flex items-center justify-center mb-4 animate-bounce-slow">
               <img src="/logo.png" alt="" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">Welcome to AJAI 2.0</h2>
+            <h2 className="text-lg font-semibold mb-2 text-white">
+              {typedTitle || "Welcome to AJAI 2.0"}
+              <span className="text-primary">|</span>
+            </h2>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Start a conversation with your AI assistant. Ask anything and get
-              intelligent responses.
+              {typedDescription ||
+                "Start a conversation with your AI assistant. Ask anything and get intelligent responses."}
             </p>
           </div>
         ) : (
           <>
             {messages.map((msg, i) => (
-              <MessageBubble key={i} message={msg} />
+              <div
+                key={`${msg.createdAt}-${i}`}
+                className={`animate-slide-in-right ${
+                  animateFromSidebar ? "opacity-100" : "opacity-100"
+                }`}
+              >
+                <MessageBubble message={msg} />
+              </div>
             ))}
             {isSending && <TypingIndicator />}
           </>

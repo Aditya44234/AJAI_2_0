@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         const message: string | undefined = body.message;
         const chatId: string | undefined = body.chatId;
         const personality = body.personality as PersonalityType | undefined;
-        console.log("Personality iin server : ", personality)
+        console.log("Personality in server : ", personality)
         
 
         const selectedPersonality: PersonalityType =

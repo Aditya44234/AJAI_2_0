@@ -1,20 +1,41 @@
 "use client";
 
-import { useEffect } from "react";
-import { useChat } from "@/context/ChatContext";
-import { useAuth } from "@/context/AuthContext";
-import { useUI } from "@/context/UIContext";
-import { PersonalitySelector } from "./PersonalitySelector";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/context/AuthContext";
+import { useChat } from "@/context/ChatContext";
+import { useUI } from "@/context/UIContext";
 import { cn } from "@/lib/utils";
-import { Plus, MessageSquare, LogOut, LogIn, X, Bot } from "lucide-react";
+import {
+  Clock4,
+  LogIn,
+  LogOut,
+  MessageSquare,
+  MoreVertical,
+  Pin,
+  PinOff,
+  Plus,
+  Trash2,
+  X,
+  PinIcon ,
+  MapPin 
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { PersonalitySelector } from "./PersonalitySelector";
 
 import Link from "next/link";
 
 export function Sidebar() {
-  const { chatList, currentChatId, loadChatList, loadChat, startNewChat } =
-    useChat();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const {
+    chatList,
+    currentChatId,
+    loadChatList,
+    loadChat,
+    startNewChat,
+    deleteChat,
+    togglePinChat,
+  } = useChat();
   const { user, logout } = useAuth();
   const { sidebarOpen, setSidebarOpen } = useUI();
 
@@ -55,7 +76,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed md:relative z-50 flex flex-col h-full w-72 bg-sidebar border-r border-sidebar-border transition-transform duration-300",
+          "fixed md:relative z-50 flex flex-col h-full w-72 bg-sidebar  border-sidebar-border transition-transform duration-300",
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}
       >
@@ -102,9 +123,10 @@ export function Sidebar() {
 
         {/* Chat List */}
         <div className="flex-1 overflow-hidden mt-4">
-          <div className="px-4 mb-2">
-            <span className="text-xs text-muted-foreground uppercase tracking-wider">
-              Recent Chats
+          <div className=" flex px-4 mb-2 mt-2">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider font-bold flex gap-3 items-center ">
+              <Clock4 className="w-5 h-5" />
+              Chat History
             </span>
           </div>
           <ScrollArea className="h-full px-3">
@@ -115,26 +137,80 @@ export function Sidebar() {
                 </p>
               ) : (
                 chatList.map((chat) => (
-                  <button
+                  <div
                     key={chat.chatId}
-                    onClick={() => handleChatClick(chat.chatId)}
                     className={cn(
-                      "w-full flex items-start gap-2 p-2 rounded-lg text-left text-sm transition-colors hover:bg-sidebar-accent cursor-pointer border-b-2 ",
-                      currentChatId === chat.chatId && "bg-sidebar-accent",
+                      "relative w-full rounded-lg border-b-4 border-r-4   bg-card transition-all overflow-visible flex items-center justify-between cursor-pointer  hover:bg-sidebar-accent ",
+                      currentChatId === chat.chatId
+                        ? "bg-sidebar-accent"
+                        : "bg-sidebar",
                     )}
+                    onClick={() => handleChatClick(chat.chatId)}
                   >
-                    <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium truncate text-sidebar-foreground">
-                        {chat.title}
-                      </p>
-                      {chat.lastMessage && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {chat.lastMessage.slice(0, 25)}.........
-                        </p>
-                      )}
+                    <div className="flex items-center">
+                      <button className="flex-1 flex min-w-0 items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
+                        {/* <MessageSquare className="w-4 h-4 text-muted-foreground" /> */}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate text-sidebar-foreground">
+                            {chat.title}
+                          </p>
+                          {/* <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                            {chat.lastMessage ? `${chat.lastMessage.slice(0, 24)}...` : "No messages yet"}
+                          </div> */}
+                        </div>
+                      </button>
                     </div>
-                  </button>
+                    <div className="flex justify-center items-center  ">
+                      {/*  Show whether pinned or not  */}
+                      {chat.pinned && (
+                        <PinIcon className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      {/*  More icon button to see the delete and Pon options for chat  */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(
+                            openMenuId === chat.chatId ? null : chat.chatId,
+                          );
+                        }}
+                        className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground  cursor-pointer"
+                        aria-label="Open chat actions"
+                      >
+                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </div>
+
+                    {openMenuId === chat.chatId && (
+                      <div className="absolute right-2 top-12 z-50 w-44 rounded-lg border border-border bg-background p-2 shadow-lg">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            void togglePinChat(chat.chatId, !chat.pinned);
+                          }}
+                          className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-foreground hover:bg-muted  cursor-pointer"
+                        >
+                          {chat.pinned ? (
+                            <PinOff className="w-3.5 h-3.5 cursor-pointer" />
+                          ) : (
+                            <Pin className="w-3.5 h-3.5 cursor-pointer" />
+                          )}
+                          {chat.pinned ? "Unpin chat" : "Pin chat"}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            void deleteChat(chat.chatId);
+                          }}
+                          className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10  cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Delete chat
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ))
               )}
             </div>
@@ -175,9 +251,12 @@ export function Sidebar() {
             </div>
           ) : (
             <Link href="/login">
-              <Button variant="outline" className="w-full justify-start gap-2 cursor-pointer
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 cursor-pointer
               
-              ">
+              "
+              >
                 <LogIn className="w-4 h-4" />
                 Login / Register
               </Button>

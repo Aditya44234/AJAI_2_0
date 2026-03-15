@@ -68,3 +68,27 @@ export async function sendMessage(
   }
   return res.json()
 }
+
+
+
+export async function deleteChat(chatId: string): Promise<void> {
+  const res = await fetch(`/api/chat/${chatId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || "Delete chat failed");
+  }
+}
+
+export async function setChatPinned(chatId: string, pinned: boolean): Promise<void> {
+  const res = await fetch(`/api/chat/${chatId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pinned }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || "Pin/unpin failed");
+  }
+}

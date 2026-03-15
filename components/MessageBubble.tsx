@@ -59,10 +59,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     >
       <div
         className={cn(
-          "relative max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed",
+          "relative max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed transition-all duration-300",
           isUser
             ? "bg-primary text-primary-foreground rounded-br-md"
-            : "bg-card text-card-foreground rounded-bl-md border border-border",
+            : "bg-card text-card-foreground rounded-bl-md border border-border animate-message-pulse",
           // base pseudo element
           "before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2",
           isUser
@@ -80,9 +80,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               ],
         )}
       >
-        {/* <p className="whitespace-pre-wrap break-words ">{message.content}</p> */}
-        <div className="whitespace-pre-wrap break-words 
-        ">
+        <div className="whitespace-pre-wrap break-words ">
           <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
       </div>
