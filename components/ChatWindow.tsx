@@ -26,6 +26,10 @@ export function ChatWindow() {
   const lastMessage = messages[messages.length - 1];
   const isAssistantStreaming =
     lastMessage?.role === "assistant" && lastMessage.status === "streaming";
+  const latestAssistantMessageIndex = [...messages]
+    .map((message, index) => ({ message, index }))
+    .reverse()
+    .find(({ message }) => message.role === "assistant")?.index;
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -90,6 +94,24 @@ export function ChatWindow() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send message");
     }
+  };
+
+  const handleResend = async (messageIndex: number) => {
+    if (isSending) {
+      return;
+    }
+
+    const previousUserMessage = messages
+      .slice(0, messageIndex)
+      .reverse()
+      .find((message) => message.role === "user");
+
+    if (!previousUserMessage?.content) {
+      setError("Could not find the prompt for this response");
+      return;
+    }
+
+    await handleSend(previousUserMessage.content);
   };
 
   return (
@@ -169,7 +191,14 @@ export function ChatWindow() {
                   animateFromSidebar ? "opacity-100" : "opacity-100"
                 }`}
               >
-                <MessageBubble message={msg} />
+                <MessageBubble
+                  message={msg}
+                  canResend={
+                    msg.role === "assistant" && i === latestAssistantMessageIndex
+                  }
+                  onResend={() => handleResend(i)}
+                  resendDisabled={isSending}
+                />
               </div>
             ))}
             {isSending && !isAssistantStreaming && <TypingIndicator />}
