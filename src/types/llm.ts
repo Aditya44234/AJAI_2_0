@@ -8,5 +8,5 @@ export interface LLMMessage {
 
 export interface LLMProvider {
     name: string;
-    sendMessage(messages: LLMMessage[]): Promise<string>;
+    streamMessage(messages: LLMMessage[]): Promise<AsyncIterable<string>>;
 }

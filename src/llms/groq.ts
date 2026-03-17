@@ -8,12 +8,20 @@ const groq = new Groq({
 export const GroqProvider: LLMProvider = {
     name: "groq",
 
-    async sendMessage(messages: LLMMessage[]) {
+    async streamMessage(messages: LLMMessage[]) {
         // ✅ UPDATED, SUPPORTED MODEL
         const response = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",  // Official replacement
             messages,
+            stream: true,
         });
-        return response.choices[0].message.content || "";
+        return (async function* () {
+            for await (const chunk of response) {
+                const text = chunk.choices[0]?.delta?.content ?? "";
+                if (text) {
+                    yield text;
+                }
+            }
+        })();
     },
 };

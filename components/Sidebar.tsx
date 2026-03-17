@@ -140,14 +140,14 @@ export function Sidebar() {
                   <div
                     key={chat.chatId}
                     className={cn(
-                      "relative w-full rounded-lg border-t-4   bg-card transition-all overflow-visible flex items-center justify-between cursor-pointer  hover:bg-sidebar-accent ",
+                      "relative w-full rounded-lg border-t-4   bg-card transition-all overflow-visible flex items-center justify-between  cursor-pointer  hover:bg-sidebar-accent  ",
                       currentChatId === chat.chatId
                         ? "bg-sidebar-accent"
                         : "bg-sidebar",
                     )}
                     onClick={() => handleChatClick(chat.chatId)}
                   >
-                    <div className="flex items-center">
+                    <div className="flex ">
                       <button className="flex-1 flex min-w-0 items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
                         {/* <MessageSquare className="w-4 h-4 text-muted-foreground" /> */}
                         <div className="min-w-0 flex-1">
@@ -165,6 +165,7 @@ export function Sidebar() {
                       {chat.pinned && (
                         <PinIcon className="w-4 h-4 text-muted-foreground" />
                       )}
+
                       {/*  More icon button to see the delete and Pon options for chat  */}
                       <button
                         onClick={(e) => {
@@ -176,7 +177,7 @@ export function Sidebar() {
                         className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground  cursor-pointer"
                         aria-label="Open chat actions"
                       >
-                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                        <MoreVertical className="w-4 h-4 text-muted-foreground flex " />
                       </button>
                     </div>
 

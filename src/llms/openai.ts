@@ -9,11 +9,20 @@ const client = new OpenAI({
 
 export const OpenAIProvider: LLMProvider = {
     name: "openai",
-    async sendMessage(messages: LLMMessage[]) {
+    async streamMessage(messages: LLMMessage[]) {
         const response = await client.chat.completions.create({
             model: "gpt-4o-mini",
             messages,
+            stream: true,
         });
-        return response.choices[0].message.content || "";
+
+        return (async function* () {
+            for await (const chunk of response) {
+                const text = chunk.choices[0]?.delta?.content ?? "";
+                if (text) {
+                    yield text;
+                }
+            }
+        })();
     },
 }

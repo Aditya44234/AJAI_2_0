@@ -9,7 +9,7 @@ import {
 
 import { checkAndIncrementUsage } from "@/src/services/usage.service";
 import { getTempUserId } from "@/src/utils/tempUser";
-import { generateAIResponses } from "@/src/services/modelRouter.service";
+import { generateAIResponseStream } from "@/src/services/modelRouter.service";
 
 import { LLMMessage } from "@/src/types/llm";
 import {
@@ -19,11 +19,17 @@ import {
 
 import { corsHeaders, handleCors } from "@/src/middleware/cors";
 
+function streamHeaders() {
+    return {
+        ...corsHeaders(),
+        "Cache-Control": "no-cache, no-transform",
+        "Content-Type": "application/x-ndjson; charset=utf-8",
+    };
+}
 
 export async function OPTIONS() {
     return handleCors();
 }
-
 
 export async function POST(req: Request) {
     try {
@@ -31,8 +37,6 @@ export async function POST(req: Request) {
         const message: string | undefined = body.message;
         const chatId: string | undefined = body.chatId;
         const personality = body.personality as PersonalityType | undefined;
-        console.log("Personality in server : ", personality)
-        
 
         const selectedPersonality: PersonalityType =
             personality && PERSONALITY_PROMPTS[personality]
@@ -46,7 +50,6 @@ export async function POST(req: Request) {
             );
         }
 
-        // 🔥 IDENTIFY USER (LOGGED-IN OR TEMP)
         let userId: string;
         let isTemp = false;
 
@@ -58,46 +61,94 @@ export async function POST(req: Request) {
             userId = await getTempUserId();
         }
 
-        // 🔥 RATE LIMIT CHECK (BEFORE AI + DB)
         await checkAndIncrementUsage(userId, isTemp);
 
-        // 1️⃣ Create or reuse chat
         const chat = chatId
             ? { _id: chatId }
             : await createChat(userId, isTemp);
 
-        // 2️⃣ Save user message
         await addMessage(chat._id.toString(), "user", message);
 
-        // 3️⃣ Fetch history
         const history = await getChatHistory(chat._id.toString());
 
-        // 4️⃣ Build LLM message array
         const messages: LLMMessage[] = [
             {
                 role: "system",
                 content: PERSONALITY_PROMPTS[selectedPersonality],
             },
-            ...history.map((m) => ({
-                role: m.role,
-                content: m.content,
+            ...history.map((historyMessage) => ({
+                role: historyMessage.role,
+                content: historyMessage.content,
             })),
         ];
 
-        // 5️⃣ AI call
-        const { reply, provider } = await generateAIResponses(messages);
+        const encoder = new TextEncoder();
 
-        // 6️⃣ Save AI response
-        await addMessage(chat._id.toString(), "assistant", reply);
+        return new Response(
+            new ReadableStream({
+                async start(controller) {
+                    const push = (payload: Record<string, unknown>) => {
+                        controller.enqueue(encoder.encode(`${JSON.stringify(payload)}\n`));
+                    };
 
-        // 7️⃣ Return
-        return NextResponse.json({
-            chatId: chat._id,
-            reply,
-            provider,
-            personality: selectedPersonality,
-            headers: corsHeaders()
-        });
+                    let reply = "";
+
+                    try {
+                        push({
+                            type: "meta",
+                            chatId: chat._id.toString(),
+                            personality: selectedPersonality,
+                        });
+
+                        const { stream, provider } = await generateAIResponseStream(messages);
+
+                        push({
+                            type: "meta",
+                            chatId: chat._id.toString(),
+                            provider,
+                            personality: selectedPersonality,
+                        });
+
+                        for await (const delta of stream) {
+                            if (!delta) {
+                                continue;
+                            }
+
+                            reply += delta;
+                            push({ type: "delta", text: delta });
+                        }
+
+                        if (reply) {
+                            await addMessage(chat._id.toString(), "assistant", reply);
+                        }
+
+                        push({
+                            type: "done",
+                            chatId: chat._id.toString(),
+                            provider,
+                        });
+                    } catch (error) {
+                        if (reply) {
+                            try {
+                                await addMessage(chat._id.toString(), "assistant", reply);
+                            } catch {
+                                // Ignore persistence failures for partial replies.
+                            }
+                        }
+
+                        push({
+                            type: "error",
+                            message: error instanceof Error ? error.message : "Something went wrong",
+                        });
+                    } finally {
+                        controller.close();
+                    }
+                },
+            }),
+            {
+                headers: streamHeaders(),
+            }
+        );
     } catch (error: any) {
         return NextResponse.json(
             { message: error.message || "Something went wrong" },

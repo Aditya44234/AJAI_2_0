@@ -1,7 +1,9 @@
 export interface Message {
+  id?: string
   role: "user" | "assistant"
   content: string
   createdAt?: string
+  status?: "streaming" | "done"
 }
 
 export interface Chat {
@@ -9,7 +11,7 @@ export interface Chat {
   title: string
   createdAt: string
   lastMessage?: string
-  pinned?:boolean
+  pinned?: boolean
 }
 
 export interface ChatDetails {
@@ -18,10 +20,10 @@ export interface ChatDetails {
   messages: Message[]
 }
 
-export type Personality = "default" | "rude" | "hopeful" | "aggressive" | "happy" |"mentor"
+export type Personality = "default" | "rude" | "hopeful" | "aggressive" | "happy" | "mentor"
 
-export interface SendMessageResponse {
-  chatId: string
+export interface SendMessageStreamResult {
+  chatId?: string
   reply: string
-  provider: "Gemini" | "Groq"
+  provider?: string
 }

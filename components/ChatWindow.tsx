@@ -23,6 +23,9 @@ export function ChatWindow() {
   const [typedDescription, setTypedDescription] = useState("");
   const [animateFromSidebar, setAnimateFromSidebar] = useState(false);
   const { user } = useAuth();
+  const lastMessage = messages[messages.length - 1];
+  const isAssistantStreaming =
+    lastMessage?.role === "assistant" && lastMessage.status === "streaming";
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -73,13 +76,12 @@ export function ChatWindow() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      // scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       scrollRef.current.scrollTo({
         top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
+        behavior: isAssistantStreaming ? "auto" : "smooth",
       });
     }
-  }, [messages, isSending]);
+  }, [messages, isAssistantStreaming]);
 
   const handleSend = async (content: string) => {
     setError(null);
@@ -170,7 +172,7 @@ export function ChatWindow() {
                 <MessageBubble message={msg} />
               </div>
             ))}
-            {isSending && <TypingIndicator />}
+            {isSending && !isAssistantStreaming && <TypingIndicator />}
           </>
         )}
       </div>

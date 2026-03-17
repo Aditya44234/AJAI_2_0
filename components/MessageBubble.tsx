@@ -1,42 +1,3 @@
-// "use client"
-
-// import { cn } from "@/lib/utils"
-// import type { Message } from "@/types/chat"
-// import { Bot, User } from "lucide-react"
-
-// interface MessageBubbleProps {
-//   message: Message
-// }
-
-// export function MessageBubble({ message }: MessageBubbleProps) {
-//   const isUser = message.role === "user"
-
-//   return (
-//     <div className={cn("flex gap-3 w-full", isUser ? "justify-end" : "justify-start")}>
-//       {/* {!isUser && (
-//         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-//           <Bot className="w-4 h-4 text-accent-foreground" />
-//         </div>
-//       )} */}
-//       <div
-//         className={cn(
-//           "max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed",
-//           isUser
-//             ? "bg-primary text-primary-foreground rounded-br-md"
-//             : "bg-card text-card-foreground rounded-bl-md border border-border"
-//         )}
-//       >
-//         <p className="whitespace-pre-wrap break-words flex ">{message.content}</p>
-//       </div>
-//       {/* {isUser && (
-//         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-//           <User className="w-4 h-4 text-primary-foreground" />
-//         </div>
-//       )} */}
-//     </div>
-//   )
-// }
-
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -49,6 +10,7 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
+  const isStreaming = message.status === "streaming";
 
   return (
     <div
@@ -59,28 +21,22 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     >
       <div
         className={cn(
-          "relative max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed transition-all duration-300",
+          "relative  px-4 py-3 rounded-2xl text-sm leading-relaxed transition-all duration-300",
           isUser
             ? "bg-card text-white rounded-br-md"
             : " text-card-foreground rounded-bl-md animate-message-pulse",
-          // base pseudo element
           "before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2",
-          // isUser
-          //   ? [
-          //       // user tail on right
-          //       "before:right-[-6px]",
-          //       "before:border-y-[8px] before:border-l-[8px] before:border-y-transparent before:border-l-primary before:border-r-0",
-          //     ]
-          //   : [
-          //       // bot tail on left
-          //       "before:left-[-6px]",
-          //       "before:border-y-[8px] before:border-r-[8px] before:border-y-transparent before:border-r-card before:border-l-0",
-          //       "after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:left-[-7px] after:border-y-[9px] after:border-r-[9px] after:border-y-transparent after:border-r-border after:border-l-0",
-          //     ],
         )}
       >
         <div className="whitespace-pre-wrap break-words text-xl">
-          <ReactMarkdown>{message.content}</ReactMarkdown>
+          {isStreaming && !isUser ? (
+            <>
+              {message.content}
+              <span className="ml-1 inline-block h-5 w-2 animate-pulse rounded-sm bg-current align-middle opacity-70" />
+            </>
+          ) : (
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          )}
         </div>
       </div>
     </div>
