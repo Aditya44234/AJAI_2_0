@@ -11,7 +11,7 @@ import type { Chat, Message, Personality } from "@/types/chat";
 import * as api from "@/services/api";
 
 const STREAM_RENDER_INTERVAL_MS = 28;
-const STREAM_RENDER_CHARS_PER_TICK = 13;
+const STREAM_RENDER_CHARS_PER_TICK = 18;
 const STREAM_RENDER_INITIAL_BURST = 12;
 
 interface ChatContextType {

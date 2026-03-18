@@ -110,7 +110,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask anything..."
+            placeholder="Ask AJAI...."
             disabled={disabled}
             rows={1}
             className="chat-input-textarea flex-1 resize-none overflow-y-auto bg-transparent text-lg outline-none placeholder:text-muted-foreground max-h-[160px] min-h-[44px]"
