@@ -10,15 +10,13 @@ import {
   Clock4,
   LogIn,
   LogOut,
-  MessageSquare,
   MoreVertical,
   Pin,
+  PinIcon,
   PinOff,
   Plus,
   Trash2,
-  X,
-  PinIcon ,
-  MapPin 
+  X
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PersonalitySelector } from "./PersonalitySelector";
@@ -140,7 +138,7 @@ export function Sidebar() {
                   <div
                     key={chat.chatId}
                     className={cn(
-                      "relative w-full rounded-lg border-t-4   bg-card transition-all overflow-visible flex items-center justify-between  cursor-pointer  hover:bg-sidebar-accent  ",
+                      "relative w-full  rounded-lg border-t-4   bg-card transition-all overflow-visible flex items-center justify-between  cursor-pointer  hover:bg-sidebar-accent  ",
                       currentChatId === chat.chatId
                         ? "bg-sidebar-accent"
                         : "bg-sidebar",
@@ -148,7 +146,7 @@ export function Sidebar() {
                     onClick={() => handleChatClick(chat.chatId)}
                   >
                     <div className="flex ">
-                      <button className="flex-1 flex min-w-0 items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
+                      <button className="flex-1 flex  items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
                         {/* <MessageSquare className="w-4 h-4 text-muted-foreground" /> */}
                         <div className="min-w-0 flex-1">
                           <p className="font-medium truncate text-sidebar-foreground">
@@ -160,7 +158,8 @@ export function Sidebar() {
                         </div>
                       </button>
                     </div>
-                    <div className="flex justify-center items-center  ">
+
+                    <div className="flex justify-center items-center   ">
                       {/*  Show whether pinned or not  */}
                       {chat.pinned && (
                         <PinIcon className="w-4 h-4 text-muted-foreground" />
@@ -177,7 +176,7 @@ export function Sidebar() {
                         className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground  cursor-pointer"
                         aria-label="Open chat actions"
                       >
-                        <MoreVertical className="w-4 h-4 text-muted-foreground flex " />
+                        <MoreVertical className="w-4 h-4 text-muted-foreground " />
                       </button>
                     </div>
 

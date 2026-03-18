@@ -97,7 +97,7 @@ export function MessageBubble({
               variant="ghost"
               size="sm"
               onClick={handleCopy}
-              className="h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground"
+              className="h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground  cursor-pointer"
             >
               <Copy className="h-3.5 w-3.5" />
               {copyState === "copied"
@@ -114,11 +114,11 @@ export function MessageBubble({
               aria-pressed={feedback === "liked"}
               onClick={() => handleFeedback("liked")}
               className={cn(
-                "h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground",
-                feedback === "liked" && "bg-primary/10 text-primary",
+                "h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground   cursor-pointer",
+                feedback === "liked" && " text-primary  ",
               )}
             >
-              <ThumbsUp className="h-3.5 w-3.5" />
+              <ThumbsUp className="h-3.5 w-3.5  cursor-pointer" />
               Like
             </Button>
 
@@ -129,11 +129,11 @@ export function MessageBubble({
               aria-pressed={feedback === "disliked"}
               onClick={() => handleFeedback("disliked")}
               className={cn(
-                "h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground",
-                feedback === "disliked" && "bg-destructive/10 text-destructive",
+                "h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground  cursor-pointer",
+                feedback === "disliked" && " text-destructive",
               )}
             >
-              <ThumbsDown className="h-3.5 w-3.5" />
+              <ThumbsDown className="h-3.5 w-3.5 cursor-pointer" />
               Dislike
             </Button>
 
@@ -144,9 +144,9 @@ export function MessageBubble({
                 size="sm"
                 onClick={() => void onResend()}
                 disabled={resendDisabled}
-                className="h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground"
+                className="h-8 rounded-full px-3 text-xs text-muted-foreground cursor-pointer  hover:text-foreground"
               >
-                <RefreshCcw className="h-3.5 w-3.5" />
+                <RefreshCcw className="h-3.5 w-3.5  cursor-pointer" />
                 Resend
               </Button>
             )}

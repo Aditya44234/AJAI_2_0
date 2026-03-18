@@ -127,7 +127,8 @@ export function ChatWindow() {
           <Menu className="w-5 h-5" />
           <span className="sr-only">Toggle sidebar</span>
         </Button>
-        {/* <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-2 md:hidden lg:hidden ">
           <div className="w-20 h-13 rounded-full flex items-center justify-center">
             <img src="/logo.png" alt="" />
           </div>
@@ -137,7 +138,8 @@ export function ChatWindow() {
               {personality} mode
             </p>
           </div>
-        </div> */}
+        </div>
+        
         <div className="ml-auto flex items-center">
           {user ? (
             <button
