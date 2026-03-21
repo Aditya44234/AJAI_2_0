@@ -6,9 +6,12 @@ import {
   useState,
   useCallback,
   type ReactNode,
+  useEffect,
 } from "react";
 import type { Chat, Message, Personality } from "@/types/chat";
 import * as api from "@/services/api";
+
+import { useParams, useRouter } from "next/navigation";
 
 const STREAM_RENDER_INTERVAL_MS = 28;
 const STREAM_RENDER_CHARS_PER_TICK = 18;
@@ -18,6 +21,7 @@ interface ChatContextType {
   chatList: Chat[];
   currentChatId: string | null;
   messages: Message[];
+  isChatListLoading: boolean;
   isLoading: boolean;
   isSending: boolean;
   loadChatList: () => Promise<void>;
@@ -56,12 +60,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [chatList, setChatList] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isChatListLoading, setIsChatListLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
+  const params = useParams<{ chatId?: string }>();
+  const router = useRouter();
+  const routeChatId = typeof params.chatId === "string" ? params.chatId : null;
+
   const loadChatList = useCallback(async () => {
-    const chats = await api.getChatList();
-    setChatList(chats);
+    setIsChatListLoading(true);
+    try {
+      const chats = await api.getChatList();
+      setChatList(chats);
+    } finally {
+      setIsChatListLoading(false);
+    }
   }, []);
 
   const loadChat = useCallback(async (chatId: string) => {
@@ -77,6 +91,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Around 100 lines of code just for single function to send the query
   const sendMessage = useCallback(
     async (content: string, personality: Personality) => {
       let pendingAssistantText = "";
@@ -84,6 +99,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       let streamFinished = false;
       let drainResolver: (() => void) | null = null;
       let displayTimer: ReturnType<typeof setInterval> | null = null;
+      let didRouteToNewChat = false;
 
       const assistantTimestamp = new Date().toISOString();
 
@@ -211,6 +227,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             onMeta: (event) => {
               if (event.chatId) {
                 setCurrentChatId(event.chatId);
+                if (!currentChatId && !didRouteToNewChat) {
+                  didRouteToNewChat = true;
+                  router.replace(`/chat/${event.chatId}`);
+                }
               }
             },
             onDelta: (text) => {
@@ -254,7 +274,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         await loadChatList().catch(() => undefined);
       }
     },
-    [currentChatId, loadChatList],
+    [currentChatId, loadChatList, router],
   );
 
   const startNewChat = useCallback(() => {
@@ -262,17 +282,29 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setMessages([]);
   }, []);
 
+  useEffect(() => {
+    if (!routeChatId) {
+      startNewChat();
+      return;
+    }
+
+    void loadChat(routeChatId).catch(() => {
+      router.replace("/");
+    });
+  }, [routeChatId, loadChat, startNewChat, router]);
+
   const deleteChat = useCallback(
     async (chatId: string) => {
       await api.deleteChat(chatId);
       if (currentChatId === chatId) {
         setCurrentChatId(null);
         setMessages([]);
+        router.replace("/");
       }
 
       await loadChatList();
     },
-    [currentChatId, loadChatList],
+    [currentChatId, loadChatList, router],
   );
 
   const togglePinChat = useCallback(
@@ -289,6 +321,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         chatList,
         currentChatId,
         messages,
+        isChatListLoading,
         isLoading,
         isSending,
         loadChatList,
