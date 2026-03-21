@@ -9,7 +9,7 @@ import React from "react";
  */
 export function TypingIndicator() {
   return (
-    <div className="flex gap-3 w-full justify-start items-center">
+    <div className="flex gap-3 w-full justify-start items-center p-3">
       {/* Container with Pulse and Spin animations */}
       <div className="relative w-10 h-10 flex items-center justify-center animate-pulse duration-1000">
         

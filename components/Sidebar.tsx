@@ -148,7 +148,7 @@ export function Sidebar() {
                     <div className="flex ">
                       <button className="flex-1 flex  items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
                         {/* <MessageSquare className="w-4 h-4 text-muted-foreground" /> */}
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex">
                           <p className="font-medium truncate text-sidebar-foreground">
                             {chat.title}
                           </p>
