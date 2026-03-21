@@ -68,7 +68,8 @@ export function MessageBubble({
         isUser ? "justify-end" : "justify-start",
       )}
     >
-      <div className="flex max-w-[85%] flex-col">
+      {/* <div className="flex max-w-[85%] flex-col"> */}
+      <div className="flex max-w-full flex-col">
         <div
           className={cn(
             "relative px-4 py-3 rounded-2xl text-sm leading-relaxed transition-all duration-300",

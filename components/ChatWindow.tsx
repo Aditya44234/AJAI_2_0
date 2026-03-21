@@ -117,7 +117,7 @@ export function ChatWindow() {
   return (
     <div className="relative flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3  border-border bg-card/50 backdrop-blur-sm bg-sidebar">
+      <header className="flex items-center gap-3 px-4 py-3  border-border bg-card/50 backdrop-blur-sm ">
         <Button
           variant="ghost"
           size="icon"

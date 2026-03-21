@@ -159,7 +159,7 @@ export function Sidebar() {
                       </button>
                     </div>
 
-                    <div className="flex justify-center items-center   ">
+                    <div className="flex justify-center items-center    ">
                       {/*  Show whether pinned or not  */}
                       {chat.pinned && (
                         <PinIcon className="w-4 h-4 text-muted-foreground" />
