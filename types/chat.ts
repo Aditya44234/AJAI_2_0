@@ -20,7 +20,7 @@ export interface ChatDetails {
   messages: Message[]
 }
 
-export type Personality = "default" | "rude" | "hopeful" | "aggressive" | "happy" | "mentor"
+export type Personality = "default" | "rude" | "hopeful" | "aggressive" | "happy" | "mentor" |"gestor"
 
 export interface SendMessageStreamResult {
   chatId?: string

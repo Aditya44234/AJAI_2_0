@@ -1,0 +1,89 @@
+"use client";
+import { useRouter } from "next/router";
+import {
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
+import type {
+  User,
+  LoginCredentials,
+  RegisterCredentials,
+} from "../../types/user";
+
+import * as api from "@/services/api";
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void api
+      .getCurrentUser()
+      .then((currentUser) => {
+        if (isMounted) {
+          setUser(currentUser);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setUser(null);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const login = useCallback(async (credentials: LoginCredentials) => {
+    const response = await api.login(credentials);
+    setUser(response.user);
+  }, []);
+
+  const register = useCallback(async (credentials: RegisterCredentials) => {
+    const response = await api.register(credentials);
+    setUser(response.user);
+  }, []);
+
+  const logout = useCallback(async () => {
+    await api.logout();
+    router.push("/login");
+    setUser(null);
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ isLoading, user, login, logout, register }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
