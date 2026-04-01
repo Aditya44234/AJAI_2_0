@@ -49,7 +49,7 @@ export function ChatWindow() {
 
     const title = "Welcome to AJAI 2.0";
     const description =
-      "Start a conversation with your AI assistant. Ask anything and get intelligent responses.";
+      "Start a conversation with your AI assistant. Ask anything .";
 
     let titleIndex = 0;
     let descriptionIndex = 0;
