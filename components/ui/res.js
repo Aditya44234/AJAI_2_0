@@ -1,6 +1,5 @@
 // 1)  Function that return the reverse of a string 
 
-const { ReceiptEuro } = require("lucide-react");
 
 // Approch 1
 const reverseString = (str) => {
@@ -95,6 +94,7 @@ const largNumArr = (arr) => {
     }
     return maxNum;
 }
+
 const largNumArr2 = (arr) => {
    return arr.reduce((max,curr)=> curr>max ? curr :-Infinity);
 }
@@ -106,3 +106,14 @@ const arr = [1,6, 3, 1, 5, 1]
 // console.log(largNumArr(arr))
 console.log(...arr)
 
+
+
+
+let ajArr=['a','a','b']
+
+let newArr=ajArr.reduce((arr,ch)=>{
+    arr[ch]=(arr[ch] || 0)+1 
+    return arr
+},{})
+
+console.log("New array last :" , newArr)
