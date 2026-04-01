@@ -194,7 +194,7 @@ export function ChatWindow() {
             </h2>
             <p className="text-sm text-muted-foreground max-w-sm">
               {typedDescription ||
-                "Start a conversation with your AI assistant. Ask anything and get intelligent responses."}
+                "Start a conversation with your AI assistant. Ask anything."}
             </p>
           </div>
         ) : (
