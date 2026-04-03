@@ -18,7 +18,7 @@ const personalities: { value: Personality; label: string }[] = [
   { value: "rude", label: "Rude" },
   { value: "aggressive", label: "Aggressive" },
   { value: "mentor",label:"Mentor"},
-  { value: "gestor",label:"Gestor"},
+  { value: "jester",label:"Jester"},
 ]
 
 export function PersonalitySelector() {
