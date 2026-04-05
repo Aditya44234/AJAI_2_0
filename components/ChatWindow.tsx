@@ -171,19 +171,7 @@ export function ChatWindow() {
         ref={scrollRef}
         className="chat-scroll-container flex-1 overflow-y-auto  pb-40 space-y-4  w-full max-w-5xl justify-center m-auto py-2"
       >
-        {isLoading ? (
-          <div className="flex h-full min-h-[320px] flex-col items-center justify-center gap-3 px-4 text-center">
-            <Spinner className="size-10 text-primary" />
-            <div className="space-y-1">
-              <p className="text-base font-medium text-foreground">
-                Fetching chat...
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Loading messages for this conversation.
-              </p>
-            </div>
-          </div>
-        ) : messages.length === 0 ? (
+        { messages.length === 0 ? (
           <div className="flex flex-col items-center  h-full text-center px-4 animate-fade-in-up">
             <div className="w-3xs h-46 rounded-full flex items-center justify-center mb-4 animate-bounce-slow">
               <img src="/logo.png" alt="" />
