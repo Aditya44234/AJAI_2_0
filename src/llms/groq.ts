@@ -1,6 +1,7 @@
 import Groq from "groq-sdk";
 import { LLMMessage, LLMProvider } from "@/src/types/llm";
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
+// Groq, GoogleGenerativeAI
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY!,
 });

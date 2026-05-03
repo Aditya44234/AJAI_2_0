@@ -1,46 +1,34 @@
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { AuthProvider } from '@/context/AuthContext'
-import { ChatProvider } from '@/context/ChatContext'
-import { UIProvider } from '@/context/UIContext'
-import { UnhandledRejectionGuard } from '@/components/UnhandledRejectionGuard'
-import './globals.css'
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { AuthProvider } from "@/context/AuthContext";
+import { ChatProvider } from "@/context/ChatContext";
+import { UIProvider } from "@/context/UIContext";
+import { UnhandledRejectionGuard } from "@/components/UnhandledRejectionGuard";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: 'AJAI 2.0',
-  description: 'Your intelligent AI assistant powered by advanced language models',
+  title: "AJAI",
+  description:
+    "Your intelligent AI assistant powered by advanced language models",
   icons: {
-    icon: [
-      {
-        url: '/icon.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/icon.png',
+    icon: [{ url: "/AJAI20.svg", type: "image/svg+xml" }],
+    shortcut: "/AJAI20.svg",
   },
-}
+};
 
 export const viewport: Viewport = {
-  themeColor: '#2b1d14',
-  width: 'device-width',
+  themeColor: "#2b1d14",
+  width: "device-width",
   initialScale: 1,
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className="dark">
@@ -48,13 +36,11 @@ export default function RootLayout({
         <UnhandledRejectionGuard />
         <AuthProvider>
           <UIProvider>
-            <ChatProvider>
-              {children}
-            </ChatProvider>
+            <ChatProvider>{children}</ChatProvider>
           </UIProvider>
         </AuthProvider>
         <Analytics />
       </body>
     </html>
-  )
+  );
 }
