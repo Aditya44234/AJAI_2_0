@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatContext";
 import { useUI } from "@/context/UIContext";
-import { LogIn, Menu, Search } from "lucide-react";
+import { LogIn, Menu, PanelLeft, PanelLeftClose, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
@@ -15,7 +15,7 @@ import { UserProfileModal } from "./UserProfileModal";
 export function ChatWindow() {
   const { messages, isSending, isSearching, searchQuery, sendMessage } =
     useChat();
-  const { personality, toggleSidebar } = useUI();
+  const { personality, sidebarOpen, toggleSidebar } = useUI();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -133,6 +133,22 @@ export function ChatWindow() {
         >
           <Menu className="w-5 h-5" />
           <span className="sr-only">Toggle sidebar</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hidden md:inline-flex"
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? (
+            <PanelLeftClose className="w-5 h-5" />
+          ) : (
+            <PanelLeft className="w-5 h-5" />
+          )}
+          <span className="sr-only">
+            {sidebarOpen ? "Collapse sidebar" : "Open sidebar"}
+          </span>
         </Button>
 
         <div className="flex items-center gap-2 md:hidden lg:hidden">
