@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server";
+
 import { getAuthUser } from "@/src/middleware/auth.middleware";
+import { corsHeaders, handleCors } from "@/src/middleware/cors";
 
-import {
-    createChat,
-    addMessage,
-    getChatHistory,
-} from "@/src/services/chat.service";
-
+import { createChat, addMessage, getChatHistory } from "@/src/services/chat.service";
 import { checkAndIncrementUsage } from "@/src/services/usage.service";
 import { getTempUserId } from "@/src/utils/tempUser";
-import { generateAIResponseStream } from "@/src/services/modelRouter.service";
 
-import { LLMMessage } from "@/src/types/llm";
+import { generateAIResponseStream } from "@/src/services/modelRouter.service";
+import { classifyQueryForSearch } from "@/src/services/queryClassifier.service";
+import { searchWeb } from "@/src/services/webSearch.service";
+import {
+    formatSearchSources,
+} from "@/src/services/sourceFormatter.service";
+import { generateGroundedAnswerStream } from "@/src/services/groundedAnswer.service";
+
+import type { LLMMessage } from "@/src/types/llm";
+import type { SearchSource } from "@/src/types/search";
+
 import {
     PERSONALITY_PROMPTS,
     PersonalityType,
 } from "@/src/constants/personalities";
-
-import { corsHeaders, handleCors } from "@/src/middleware/cors";
 
 function streamHeaders() {
     return {
@@ -31,9 +35,80 @@ export async function OPTIONS() {
     return handleCors();
 }
 
+function buildBaseMessages(
+    history: Array<{ role: "user" | "assistant"; content: string }>,
+    personality: PersonalityType,
+): LLMMessage[] {
+    return [
+        {
+            role: "system",
+            content: PERSONALITY_PROMPTS[personality],
+        },
+        ...history.map((message) => ({
+            role: message.role,
+            content: message.content,
+        })),
+    ];
+}
+
+async function resolveUserIdentity() {
+    try {
+        const user = await getAuthUser();
+        return {
+            userId: user.id,
+            isTemp: false,
+        };
+    } catch {
+        return {
+            userId: await getTempUserId(),
+            isTemp: true,
+        };
+    }
+}
+
+async function buildAssistantResponse(
+    messages: LLMMessage[],
+): Promise<{
+    stream: AsyncIterable<string>;
+    provider: string;
+    sources: SearchSource[];
+    usedSearch: boolean;
+    searchQuery?: string;
+}> {
+    const decision = await classifyQueryForSearch(messages);
+
+    if (!decision.needsSearch) {
+        const direct = await generateAIResponseStream(messages);
+        return {
+            stream: direct.stream,
+            provider: direct.provider,
+            sources: [],
+            usedSearch: false,
+        };
+    }
+
+    const rawResults = await searchWeb(decision.searchQuery);
+    const sources = formatSearchSources(rawResults);
+
+    if (sources.length === 0) {
+        throw new Error("Search was required, but no usable web sources were found.");
+    }
+
+    const grounded = await generateGroundedAnswerStream(messages, sources);
+
+    return {
+        stream: grounded.stream,
+        provider: grounded.provider,
+        sources: grounded.sources,
+        usedSearch: true,
+        searchQuery: decision.searchQuery,
+    };
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();
+
         const message: string | undefined = body.message;
         const chatId: string | undefined = body.chatId;
         const personality = body.personality as PersonalityType | undefined;
@@ -43,23 +118,14 @@ export async function POST(req: Request) {
                 ? personality
                 : "default";
 
-        if (!message) {
+        if (!message?.trim()) {
             return NextResponse.json(
                 { message: "Message is required" },
-                { status: 400 }
+                { status: 400 },
             );
         }
 
-        let userId: string;
-        let isTemp = false;
-
-        try {
-            const user = await getAuthUser();
-            userId = user.id;
-        } catch {
-            isTemp = true;
-            userId = await getTempUserId();
-        }
+        const { userId, isTemp } = await resolveUserIdentity();
 
         await checkAndIncrementUsage(userId, isTemp);
 
@@ -71,16 +137,7 @@ export async function POST(req: Request) {
 
         const history = await getChatHistory(chat._id.toString());
 
-        const messages: LLMMessage[] = [
-            {
-                role: "system",
-                content: PERSONALITY_PROMPTS[selectedPersonality],
-            },
-            ...history.map((historyMessage) => ({
-                role: historyMessage.role,
-                content: historyMessage.content,
-            })),
-        ];
+        const messages = buildBaseMessages(history, selectedPersonality);
 
         const encoder = new TextEncoder();
 
@@ -100,22 +157,37 @@ export async function POST(req: Request) {
                             personality: selectedPersonality,
                         });
 
-                        const { stream, provider } = await generateAIResponseStream(messages);
+                        const result = await buildAssistantResponse(messages);
+
+                        if (result.usedSearch && result.searchQuery) {
+                            push({
+                                type: "search-start",
+                                query: result.searchQuery,
+                            });
+
+                            push({
+                                type: "search-results",
+                                sources: result.sources,
+                            });
+                        }
 
                         push({
                             type: "meta",
                             chatId: chat._id.toString(),
-                            provider,
+                            provider: result.provider,
                             personality: selectedPersonality,
                         });
 
-                        for await (const delta of stream) {
+                        for await (const delta of result.stream) {
                             if (!delta) {
                                 continue;
                             }
 
                             reply += delta;
-                            push({ type: "delta", text: delta });
+                            push({
+                                type: "delta",
+                                text: delta,
+                            });
                         }
 
                         if (reply) {
@@ -125,20 +197,24 @@ export async function POST(req: Request) {
                         push({
                             type: "done",
                             chatId: chat._id.toString(),
-                            provider,
+                            provider: result.provider,
+                            sources: result.sources,
                         });
                     } catch (error) {
                         if (reply) {
                             try {
                                 await addMessage(chat._id.toString(), "assistant", reply);
                             } catch {
-                                // Ignore persistence failures for partial replies.
+                                // Ignore assistant persistence failure for partial output.
                             }
                         }
 
                         push({
                             type: "error",
-                            message: error instanceof Error ? error.message : "Something went wrong",
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : "Something went wrong",
                         });
                     } finally {
                         controller.close();
@@ -147,12 +223,15 @@ export async function POST(req: Request) {
             }),
             {
                 headers: streamHeaders(),
-            }
+            },
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { message: error.message || "Something went wrong" },
-            { status: 400 }
+            {
+                message:
+                    error instanceof Error ? error.message : "Something went wrong",
+            },
+            { status: 400 },
         );
     }
 }

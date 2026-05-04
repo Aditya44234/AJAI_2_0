@@ -8,9 +8,8 @@ import {
   type ReactNode,
   useEffect,
 } from "react";
-import type { Chat, Message, Personality } from "@/types/chat";
+import type { Chat, Message, Personality, SearchSource } from "@/types/chat";
 import * as api from "@/services/api";
-
 import { useParams, useRouter } from "next/navigation";
 
 const STREAM_RENDER_INTERVAL_MS = 28;
@@ -24,6 +23,8 @@ interface ChatContextType {
   isChatListLoading: boolean;
   isLoading: boolean;
   isSending: boolean;
+  isSearching: boolean;
+  searchQuery: string | null;
   loadChatList: () => Promise<void>;
   loadChat: (chatId: string) => Promise<void>;
   sendMessage: (content: string, personality: Personality) => Promise<void>;
@@ -63,6 +64,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isChatListLoading, setIsChatListLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
   const params = useParams<{ chatId?: string }>();
   const router = useRouter();
@@ -91,7 +94,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Around 100 lines of code just for single function to send the query
   const sendMessage = useCallback(
     async (content: string, personality: Personality) => {
       let pendingAssistantText = "";
@@ -127,9 +129,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               content: text,
               createdAt: assistantTimestamp,
               status: "streaming",
+              sources: [],
             },
           ];
         });
+      };
+
+      const attachSourcesToAssistant = (sources: SearchSource[]) => {
+        setMessages((prev) =>
+          updateLastAssistantMessage(prev, (message) => ({
+            ...message,
+            sources,
+          })),
+        );
       };
 
       const finalizeDrainIfReady = () => {
@@ -217,6 +229,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       setMessages((prev) => [...prev, userMessage]);
       setIsSending(true);
+      setIsSearching(false);
+      setSearchQuery(null);
 
       try {
         const response = await api.sendMessageStream(
@@ -233,8 +247,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 }
               }
             },
+            onSearchStart: (query) => {
+              setIsSearching(true);
+              setSearchQuery(query);
+            },
+            onSearchResults: (sources) => {
+              attachSourcesToAssistant(sources);
+            },
             onDelta: (text) => {
               queueAssistantText(text);
+            },
+            onDone: (event) => {
+              if (event.sources?.length) {
+                attachSourcesToAssistant(event.sources);
+              }
+              setIsSearching(false);
+              setSearchQuery(null);
             },
           },
         );
@@ -251,12 +279,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               ? {
                   ...message,
                   status: "done",
+                  sources: response.sources ?? message.sources,
                 }
               : null,
           ),
         );
       } catch (error) {
         await waitForDisplayDrain();
+        setIsSearching(false);
+        setSearchQuery(null);
 
         setMessages((prev) =>
           updateLastAssistantMessage(prev, (message) =>
@@ -268,6 +299,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               : null,
           ),
         );
+
         throw error;
       } finally {
         setIsSending(false);
@@ -280,6 +312,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const startNewChat = useCallback(() => {
     setCurrentChatId(null);
     setMessages([]);
+    setIsSearching(false);
+    setSearchQuery(null);
   }, []);
 
   useEffect(() => {
@@ -299,6 +333,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       if (currentChatId === chatId) {
         setCurrentChatId(null);
         setMessages([]);
+        setIsSearching(false);
+        setSearchQuery(null);
         router.replace("/");
       }
 
@@ -324,6 +360,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         isChatListLoading,
         isLoading,
         isSending,
+        isSearching,
+        searchQuery,
         loadChatList,
         loadChat,
         sendMessage,
