@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AuthProvider } from "@/context/AuthContext";
 import { ChatProvider } from "@/context/ChatContext";
@@ -7,7 +7,10 @@ import { UIProvider } from "@/context/UIContext";
 import { UnhandledRejectionGuard } from "@/components/UnhandledRejectionGuard";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage-grotesque",
+});
 
 export const metadata: Metadata = {
   title: "AJAI",
@@ -32,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${bricolageGrotesque.variable} font-sans antialiased`}>
         <UnhandledRejectionGuard />
         <AuthProvider>
           <UIProvider>

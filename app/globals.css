@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Quantico:wght@200..900&display=swap');
-
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -42,12 +40,6 @@
   --sidebar-ring: oklch(0.55 0.10 55);
 }
 
-body {
-  /* font-family: 'Oxanium', sans-serif; */
-  font-family: 'Quantico', sans-serif;
-}
-
-
 .dark {
   --background: oklch(0.18 0.02 50);
   --foreground: oklch(0.95 0.01 80);
@@ -84,7 +76,7 @@ body {
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
+  --font-sans: var(--font-bricolage-grotesque);
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
