@@ -31,6 +31,10 @@ The project combines:
 - Daily usage limiting for guests and logged-in users
 - Markdown rendering for assistant responses
 - Profile modal showing user information, selected personality, and current time
+- **Intelligent Web Search Integration** - automatically determines when to search and freshness requirements
+- **Grounded Answers** - combines real-time web search results with AI responses for factual accuracy
+- **Query Classification** - AI-powered analysis to identify when web search is needed
+- **Source Attribution** - seamlessly integrates web sources into responses
 
 ## Tech Stack
 
@@ -43,6 +47,7 @@ The project combines:
 - JWT authentication via cookies
 - Gemini API
 - Groq API
+- Tavily API (Web Search)
 - Vercel Analytics
 
 ## Personality Modes
@@ -111,8 +116,11 @@ AJAI_2_0/
 - Daily usage is validated
 - A new chat is created if needed
 - The user message is saved to MongoDB
-- Message history is prepared and combined with the selected personality prompt
-- The server tries the configured model providers
+- **Query Classification**: AI analyzes if web search is needed and freshness level (stable/recent/breaking)
+- **Conditional Web Search**: If search is needed, Tavily API fetches live web results
+- **Source Formatting**: Search results are formatted and prepared for context injection
+- **Grounded Response Generation**: Message history and search context are combined with the selected personality prompt
+- The server tries the configured model providers (Gemini first, then Groq fallback)
 - The final AI reply is saved and returned to the client
 
 ### 4. Chat History
@@ -120,6 +128,40 @@ AJAI_2_0/
 - Chat titles are generated from the first user message
 - Chats are listed in the sidebar
 - Each chat can be reopened from saved history
+
+## Web Search Integration
+
+The app includes an intelligent web search system that enhances responses with real-time information:
+
+### Query Classification
+- Analyzes incoming queries to determine if web search is necessary
+- Classifies freshness requirements as "stable", "recent", or "breaking"
+- Generates optimized search queries using LLM analysis
+- Graceful fallback if classification fails
+
+### Web Search with Tavily API
+- Integrates with Tavily API for advanced web search capabilities
+- Retrieves relevant web results with title, URL, content, and publication dates
+- Configurable result limits and timeouts
+- Robust error handling for API failures
+
+### Grounded Answers
+- Combines web search results with AI-generated responses
+- Injects search context into the system prompt for factual accuracy
+- Handles source conflicts and insufficient data scenarios
+- Natural source attribution without explicit "According to Source 1" style
+
+### Source Formatting
+- Organizes multiple web sources for clear context
+- Prepares results for seamless prompt injection
+- Supports complex queries with multiple relevant sources
+
+**Relevant files:**
+- `src/services/queryClassifier.service.ts` - Query analysis and classification
+- `src/services/webSearch.service.ts` - Tavily API integration
+- `src/services/groundedAnswer.service.ts` - Response generation with search context
+- `src/services/sourceFormatter.service.ts` - Result formatting
+- `src/config/search.ts` - Search configuration
 
 ## LLM Integration
 
@@ -162,12 +204,14 @@ JWT_SECRET=your_jwt_secret
 GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
 OPENAI_API_KEY=your_openai_api_key_optional
+TAVILY_API_KEY=your_tavily_api_key
 BASE_URL=http://localhost:3000
 ```
 
 Notes:
 
 - `OPENAI_API_KEY` is optional in the current code path
+- `TAVILY_API_KEY` is required for web search functionality
 - `BASE_URL` can be adjusted depending on your local environment
 
 ## Getting Started
@@ -238,10 +282,13 @@ These models support authentication, chat persistence, message history, and dail
 
 - token streaming for real-time responses
 - explicit model selection in the UI
-- better analytics around usage and provider performance
+- advanced search filtering and result ranking
+- search result caching to reduce API calls
+- better analytics around usage, search queries, and provider performance
 - improved test coverage
 - stronger lint and CI setup
 - richer chat management actions such as rename and delete
+- multi-language support
 
 ## Author
 
