@@ -1,6 +1,5 @@
-import Groq from "groq-sdk";
 import { LLMMessage, LLMProvider } from "@/src/types/llm";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 // Groq, GoogleGenerativeAI
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY!,
@@ -12,7 +11,7 @@ export const GroqProvider: LLMProvider = {
     async streamMessage(messages: LLMMessage[]) {
         // ✅ UPDATED, SUPPORTED MODEL
         const response = await groq.chat.completions.create({
-            model: "llama-3.1-8b-instant",  // Official replacement
+            model: "openai/gpt-oss-20b",  // ✅ Recommended replacement
             messages,
             stream: true,
         });

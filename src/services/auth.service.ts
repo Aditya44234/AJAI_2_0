@@ -1,4 +1,4 @@
-import { StringQueryTypeCasting } from "mongoose";
+// import { StringQueryTypeCasting } from "mongoose";
 import { connectDB } from "../config/db";
 import { User } from "../models/User"
 import { hashPassword, comparePassword } from "../utils/hash";
