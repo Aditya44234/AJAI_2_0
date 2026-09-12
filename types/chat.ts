@@ -37,7 +37,7 @@ export type Personality =
   | "aggressive"
   | "happy"
   | "mentor"
-  | "jester";
+  | "playboy";
 
 export interface SendMessageStreamResult {
   chatId?: string;

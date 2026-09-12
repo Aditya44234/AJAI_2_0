@@ -89,7 +89,7 @@ export function Sidebar() {
             className="hidden md:inline-flex text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
-            <PanelLeftClose className="w-5 h-5" />
+            {/* <PanelLeftClose className="w-5 h-5" /> */}
             <span className="sr-only">Collapse sidebar</span>
           </Button>
           <Button

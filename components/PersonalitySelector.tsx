@@ -15,10 +15,10 @@ const personalities: { value: Personality; label: string }[] = [
   { value: "default", label: "Default" },
   { value: "happy", label: "Happy" },
   { value: "hopeful", label: "Hopeful" },
-  { value: "rude", label: "Rude" },
-  { value: "aggressive", label: "Aggressive" },
   { value: "mentor",label:"Mentor"},
-  { value: "jester",label:"Jester"},
+  { value: "rude", label: "Rude" },
+  { value: "playboy",label:"Playboy"},
+  { value: "aggressive", label: "Aggressive" },
 ]
 
 export function PersonalitySelector() {
