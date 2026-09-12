@@ -4,35 +4,64 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatContext";
 import { useUI } from "@/context/UIContext";
-import { LogIn, Menu, PanelLeft, PanelLeftClose, Search } from "lucide-react";
+
+import {
+  LogIn,
+  Menu,
+  PanelLeft,
+  PanelLeftClose,
+  Search,
+} from "lucide-react";
+
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+
 import { ChatInput } from "./ChatInput";
+import { ErrorModal } from "./ErrorModal";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { UserProfileModal } from "./UserProfileModal";
 
 export function ChatWindow() {
-  const { messages, isSending, isSearching, searchQuery, sendMessage } =
-    useChat();
+  const {
+    messages,
+    isSending,
+    isSearching,
+    searchQuery,
+    sendMessage,
+  } = useChat();
+
   const { personality, sidebarOpen, toggleSidebar } = useUI();
+
   const scrollRef = useRef<HTMLDivElement>(null);
+
   const [error, setError] = useState<string | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   const [showWelcomeTyping, setShowWelcomeTyping] = useState(true);
   const [typedTitle, setTypedTitle] = useState("");
   const [typedDescription, setTypedDescription] = useState("");
-  const [animateFromSidebar, setAnimateFromSidebar] = useState(false);
+
+  const [animateFromSidebar, setAnimateFromSidebar] =
+    useState(false);
+
   const { user } = useAuth();
 
   const lastMessage = messages[messages.length - 1];
+
   const isAssistantStreaming =
-    lastMessage?.role === "assistant" && lastMessage.status === "streaming";
+    lastMessage?.role === "assistant" &&
+    lastMessage.status === "streaming";
 
   const latestAssistantMessageIndex = [...messages]
     .map((message, index) => ({ message, index }))
     .reverse()
-    .find(({ message }) => message.role === "assistant")?.index;
+    .find(({ message }) => message.role === "assistant")
+    ?.index;
+
+  // -----------------------------------------
+  // Welcome animation
+  // -----------------------------------------
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -50,14 +79,16 @@ export function ChatWindow() {
     if (!showWelcomeTyping) return;
 
     const title = "Welcome to AJAI 2.0";
+
     const description =
-      "Start a conversation with your AI assistant. Ask anything .";
+      "Start a conversation with your AI assistant. Ask anything.";
 
     let titleIndex = 0;
     let descriptionIndex = 0;
 
     const titleTimer = setInterval(() => {
       titleIndex += 1;
+
       setTypedTitle(title.slice(0, titleIndex));
 
       if (titleIndex >= title.length) {
@@ -65,7 +96,10 @@ export function ChatWindow() {
 
         const descTimer = setInterval(() => {
           descriptionIndex += 1;
-          setTypedDescription(description.slice(0, descriptionIndex));
+
+          setTypedDescription(
+            description.slice(0, descriptionIndex)
+          );
 
           if (descriptionIndex >= description.length) {
             clearInterval(descTimer);
@@ -79,11 +113,24 @@ export function ChatWindow() {
     };
   }, [showWelcomeTyping]);
 
+  // -----------------------------------------
+  // Sidebar animation
+  // -----------------------------------------
+
   useEffect(() => {
     setAnimateFromSidebar(true);
-    const timeout = setTimeout(() => setAnimateFromSidebar(false), 450);
+
+    const timeout = setTimeout(
+      () => setAnimateFromSidebar(false),
+      450
+    );
+
     return () => clearTimeout(timeout);
   }, [messages.length]);
+
+  // -----------------------------------------
+  // Auto scroll
+  // -----------------------------------------
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -94,15 +141,28 @@ export function ChatWindow() {
     }
   }, [messages, isAssistantStreaming, isSearching]);
 
+  // -----------------------------------------
+  // Send message
+  // -----------------------------------------
+
   const handleSend = async (content: string) => {
+    // Clear any previous error
     setError(null);
 
     try {
       await sendMessage(content, personality);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send message");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send message. Please try again."
+      );
     }
   };
+
+  // -----------------------------------------
+  // Resend message
+  // -----------------------------------------
 
   const handleResend = async (messageIndex: number) => {
     if (isSending) {
@@ -115,7 +175,7 @@ export function ChatWindow() {
       .find((message) => message.role === "user");
 
     if (!previousUserMessage?.content) {
-      setError("Could not find the prompt for this response");
+      setError("Could not find the prompt for this response.");
       return;
     }
 
@@ -124,95 +184,180 @@ export function ChatWindow() {
 
   return (
     <div className="relative flex h-full flex-col">
-      <header className="flex items-center gap-3 border-border px-4 py-3 backdrop-blur-sm rounded-xl">
+
+      {/* -------------------------------- */}
+      {/* Header */}
+      {/* -------------------------------- */}
+
+      <header className="flex items-center gap-3 rounded-xl border-border px-4 py-3 backdrop-blur-sm">
+
+        {/* Mobile sidebar */}
         <Button
           variant="ghost"
           size="icon"
           className="md:hidden"
           onClick={toggleSidebar}
         >
-          <Menu className="w-5 h-5" />
-          <span className="sr-only">Toggle sidebar</span>
-        </Button>
+          <Menu className="h-5 w-5" />
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hidden md:inline-flex cursor-pointer"
-          onClick={toggleSidebar}
-        >
-          {sidebarOpen ? (
-            <PanelLeftClose className="w-5 h-5 " />
-          ) : (
-            <PanelLeft className="w-5 h-5 " />
-          )}
           <span className="sr-only">
-            {sidebarOpen ? "Collapse sidebar" : "Open sidebar"}
+            Toggle sidebar
           </span>
         </Button>
 
+        {/* Desktop sidebar */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hidden cursor-pointer md:inline-flex"
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? (
+            <PanelLeftClose className="h-5 w-5" />
+          ) : (
+            <PanelLeft className="h-5 w-5" />
+          )}
+
+          <span className="sr-only">
+            {sidebarOpen
+              ? "Collapse sidebar"
+              : "Open sidebar"}
+          </span>
+        </Button>
+
+        {/* Mobile logo */}
         <div className="flex items-center gap-2 md:hidden lg:hidden">
-          <div className="w-20 h-13 rounded-full flex items-center justify-center">
+          <div className="flex h-13 w-20 items-center justify-center rounded-full">
             <img src="/logo.png" alt="" />
           </div>
+
           <div>
-            <h1 className="text-sm font-semibold">AJAI 2.0</h1>
+            <h1 className="text-sm font-semibold">
+              AJAI 2.0
+            </h1>
+
             <p className="text-xs capitalize text-muted-foreground">
               {personality} mode
             </p>
           </div>
         </div>
 
+        {/* User */}
         <div className="ml-auto flex items-center">
+
           {user ? (
             <button
               type="button"
               onClick={() => setIsProfileOpen(true)}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-primary/30 bg-primary text-sm font-semibold uppercase text-primary-foreground shadow-sm transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-sidebar sm:h-11 sm:w-11"
+              className="
+                flex
+                h-10
+                w-10
+                cursor-pointer
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-primary/30
+                bg-primary
+                text-sm
+                font-semibold
+                uppercase
+                text-primary-foreground
+                shadow-sm
+                transition-transform
+                hover:scale-[1.03]
+                focus:outline-none
+                focus:ring-2
+                focus:ring-ring
+                focus:ring-offset-2
+                focus:ring-offset-sidebar
+                sm:h-11
+                sm:w-11
+              "
               aria-label="Open user profile"
             >
-              <span className="sr-only">{user.name}</span>
+              <span className="sr-only">
+                {user.name}
+              </span>
+
               <div className="flex h-full w-full items-center justify-center rounded-full">
                 {user.name.slice(0, 1)}
               </div>
             </button>
           ) : (
             <Link href="/login">
-              <Button variant="outline" className="gap-2 cursor-pointer">
+              <Button
+                variant="outline"
+                className="cursor-pointer gap-2"
+              >
                 <LogIn className="h-4 w-4" />
                 Login
               </Button>
             </Link>
           )}
+
         </div>
       </header>
 
+      {/* -------------------------------- */}
+      {/* Messages */}
+      {/* -------------------------------- */}
+
       <div
         ref={scrollRef}
-        className="chat-scroll-container m-auto flex-1 space-y-4 overflow-y-auto py-2 pb-40 w-full max-w-5xl justify-center"
+        className="
+          chat-scroll-container
+          m-auto
+          flex-1
+          w-full
+          max-w-5xl
+          space-y-4
+          overflow-y-auto
+          py-2
+          pb-40
+        "
       >
+
         {messages.length === 0 ? (
+
+          /* Welcome */
           <div className="flex h-full flex-col items-center px-4 text-center animate-fade-in-up">
-            <div className="w-3xs h-46 mb-4 flex items-center justify-center rounded-full animate-bounce-slow">
+
+            <div className="mb-4 flex h-46 w-3xs items-center justify-center rounded-full animate-bounce-slow">
               <img src="/logo.png" alt="" />
             </div>
+
             <h2 className="mb-2 text-lg font-semibold text-white">
               {typedTitle || "Welcome to AJAI 2.0"}
-              <span className="text-primary">|</span>
+
+              <span className="text-primary">
+                |
+              </span>
             </h2>
+
             <p className="max-w-sm text-sm text-muted-foreground">
               {typedDescription ||
                 "Start a conversation with your AI assistant. Ask anything."}
             </p>
+
           </div>
+
         ) : (
+
           <>
             {messages.map((msg, i) => (
               <div
                 key={`${msg.createdAt}-${i}`}
-                className={`animate-slide-in-right justify-center ${
-                  animateFromSidebar ? "opacity-100" : "opacity-100"
-                }`}
+                className={`
+                  animate-slide-in-right
+                  justify-center
+                  ${
+                    animateFromSidebar
+                      ? "opacity-100"
+                      : "opacity-100"
+                  }
+                `}
               >
                 <MessageBubble
                   message={msg}
@@ -226,13 +371,28 @@ export function ChatWindow() {
               </div>
             ))}
 
+            {/* Web searching */}
             {isSearching && (
               <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-md border border-primary/20 bg-card/60 px-4 py-3 text-sm text-card-foreground shadow-sm backdrop-blur-sm">
+                <div className="
+                  rounded-2xl
+                  rounded-bl-md
+                  border
+                  border-primary/20
+                  bg-card/60
+                  px-4
+                  py-3
+                  text-sm
+                  text-card-foreground
+                  shadow-sm
+                  backdrop-blur-sm
+                ">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Search className="h-4 w-4 animate-pulse text-primary" />
+
                     Searching the web
                   </div>
+
                   {searchQuery && (
                     <p className="mt-1 text-xs text-muted-foreground">
                       Query: {searchQuery}
@@ -242,20 +402,39 @@ export function ChatWindow() {
               </div>
             )}
 
-            {isSending && !isAssistantStreaming && !isSearching && (
-              <TypingIndicator />
-            )}
+            {/* Typing */}
+            {isSending &&
+              !isAssistantStreaming &&
+              !isSearching && (
+                <TypingIndicator />
+              )}
           </>
         )}
+
       </div>
 
-      {error && (
-        <div className="bg-destructive/10 px-4 py-2 text-center text-sm text-destructive">
-          {error}
-        </div>
-      )}
+      {/* -------------------------------- */}
+      {/* Chat Input */}
+      {/* -------------------------------- */}
 
-      <ChatInput onSend={handleSend} disabled={isSending} />
+      <ChatInput
+        onSend={handleSend}
+        disabled={isSending}
+      />
+
+      {/* -------------------------------- */}
+      {/* Error Modal */}
+      {/* -------------------------------- */}
+
+      <ErrorModal
+        open={!!error}
+        message={error ?? ""}
+        onClose={() => setError(null)}
+      />
+
+      {/* -------------------------------- */}
+      {/* Profile Modal */}
+      {/* -------------------------------- */}
 
       {user && (
         <UserProfileModal
@@ -265,6 +444,7 @@ export function ChatWindow() {
           personality={personality}
         />
       )}
+
     </div>
   );
 }
