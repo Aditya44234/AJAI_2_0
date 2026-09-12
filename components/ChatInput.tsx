@@ -1,70 +1,9 @@
-// "use client"
-
-// import { useState, useRef, useEffect } from "react"
-// import { Button } from "@/components/ui/button"
-// import { Send } from "lucide-react"
-
-// interface ChatInputProps {
-//   onSend: (message: string) => void
-//   disabled?: boolean
-// }
-
-// export function ChatInput({ onSend, disabled }: ChatInputProps) {
-//   const [message, setMessage] = useState("")
-//   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-//   useEffect(() => {
-//     if (textareaRef.current) {
-//       textareaRef.current.style.height = "auto"
-//       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`
-//     }
-//   }, [message])
-
-//   const handleSubmit = () => {
-//     if (message.trim() && !disabled) {
-//       onSend(message.trim())
-//       setMessage("")
-//     }
-//   }
-
-//   const handleKeyDown = (e: React.KeyboardEvent) => {
-//     if (e.key === "Enter" && !e.shiftKey) {
-//       e.preventDefault()
-//       handleSubmit()
-//     }
-//   }
-
-//   return (
-//     <div className="flex items-end gap-2 p-4 border-t border-border bg-card/50 backdrop-blur-sm no-scrollbar">
-//       <div className="flex-1 relative">
-//         <textarea
-//           ref={textareaRef}
-//           value={message}
-//           onChange={(e) => setMessage(e.target.value)}
-//           onKeyDown={handleKeyDown}
-//           placeholder="Type a message..."
-//           disabled={disabled}
-//           rows={1}
-//           className="w-full resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-//         />
-//       </div>
-//       <Button
-//         onClick={handleSubmit}
-//         disabled={disabled || !message.trim()}
-//         size="icon"
-//         className="h-11 w-11 rounded-xl flex-shrink-0"
-//       >
-//         <Send className="w-4 h-4" />
-//         <span className="sr-only">Send message</span>
-//       </Button>
-//     </div>
-//   )
-// }
-
 "use client";
 
-import { Send } from "lucide-react";
+import { ArrowUp, Plus, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { PersonalitySelector } from "./PersonalitySelector";
+import { Button } from "./ui/button";
 
 interface ChatInputProps {
   onSend: (message: string) => void | Promise<void>;
@@ -75,25 +14,31 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Auto resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
+
       textareaRef.current.style.height = `${Math.min(
         textareaRef.current.scrollHeight,
-        120,
+        160,
       )}px`;
     }
   }, [message]);
 
   const handleSubmit = () => {
     if (!message.trim() || disabled) return;
+
     void Promise.resolve(onSend(message.trim())).catch((error) => {
       console.error("Failed to send message:", error);
     });
+
     setMessage("");
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter = send
+    // Shift + Enter = new line
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -101,34 +46,132 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="absolute inset-x-0 bottom-6 flex justify-center px-4 md:px-8">
-      <div className="w-full max-w-5xl rounded-md border border-border bg-card/80 backdrop-blur-md shadow-xl">
-        <div className="flex items-end gap-4 px-6 py-4">
-          {/* Textarea */}
+    <div className="absolute inset-x-0 bottom-2 flex justify-center px-4 md:px-8">
+      <div
+        className="
+          w-full
+          max-w-5xl
+          overflow-hidden
+          rounded-[28px]
+          border
+          border-white/10
+          bg-primary/10
+          shadow-2xl
+          backdrop-blur-xl
+          transition-all
+          duration-200
+          focus-within:border-white/20
+        "
+      >
+        {/* Text area */}
+        <div className="px-5 pt-5 md:px-6 md:pt-5 ">
           <textarea
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask AJAI...."
+            placeholder="Ask anything."
             disabled={disabled}
             rows={1}
-            className="chat-input-textarea flex-1 resize-none overflow-y-auto bg-transparent text-lg outline-none placeholder:text-muted-foreground max-h-[160px] min-h-[44px]"
+            className="
+              block
+              w-full
+              resize-none
+              overflow-y-auto
+              bg-transparent
+              text-[17px]
+              leading-6 
+              text-white
+              outline-none
+              placeholder:text-[#777]
+              max-h-[120px]
+              min-h-[40px]
+              scrollbar-thin
+            "
           />
+        </div>
 
-          {/* Personality button */}
-          {/* <button className="text-base text-muted-foreground hover:text-foreground transition">
-            Personality
-          </button> */}
-
-          {/* Send Button */}
-          <button
-            onClick={handleSubmit}
-            disabled={!message.trim() || disabled}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+        {/* Bottom controls */}
+        <div className="flex items-center justify-between px-4 pb-3 pt-2 md:px-5 md:pb-4">
+          {/* Plus button */}
+          <Button
+            type="button"
+            disabled={disabled}
+            aria-label="Add attachment"
+            className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-full
+              text-white/70
+              transition
+              hover:text-white
+              disabled:cursor-not-allowed
+              disabled:opacity-40
+              cursor-not-allowed
+            "
           >
-            <Send className="w-5 h-5" />
-          </button>
+            <Plus className="h-6 w-6" strokeWidth={1.8} />
+          </Button>
+
+          {/* Right side controls */}
+          <div className="flex items-center gap-3">
+            {/* Persona selector */}
+            <Button
+              type="button"
+              disabled={disabled}
+              className="
+                flex
+                items-center
+                gap-1.5
+                rounded-lg
+                px-2
+                py-2
+                text-[15px]
+                text-white/80
+                transition
+              
+        
+                disabled:opacity-40
+              "
+            >
+              {/* <span>Persona</span> */}
+              <PersonalitySelector />
+              {/* <ChevronDown className="h-4 w-4 text-white/50" /> */}
+            </Button>
+
+            {/* Send button */}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!message.trim() || disabled}
+              aria-label="Send message"
+              className="
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                bg-white
+                text-black
+                transition-all
+                duration-150
+                hover:scale-105
+                hover:bg-white/90
+                active:scale-95
+                disabled:cursor-not-allowed
+                disabled:bg-white/20
+                disabled:text-white/40
+                disabled:hover:scale-100
+              "
+            >
+              <ArrowUp className="h-5 w-5" strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

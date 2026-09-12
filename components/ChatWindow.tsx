@@ -124,7 +124,7 @@ export function ChatWindow() {
 
   return (
     <div className="relative flex h-full flex-col">
-      <header className="flex items-center gap-3 border-border bg-card/50 px-4 py-3 backdrop-blur-sm">
+      <header className="flex items-center gap-3 border-border px-4 py-3 backdrop-blur-sm rounded-xl">
         <Button
           variant="ghost"
           size="icon"
@@ -138,13 +138,13 @@ export function ChatWindow() {
         <Button
           variant="ghost"
           size="icon"
-          className="hidden md:inline-flex"
+          className="hidden md:inline-flex cursor-pointer"
           onClick={toggleSidebar}
         >
           {sidebarOpen ? (
-            <PanelLeftClose className="w-5 h-5" />
+            <PanelLeftClose className="w-5 h-5 " />
           ) : (
-            <PanelLeft className="w-5 h-5" />
+            <PanelLeft className="w-5 h-5 " />
           )}
           <span className="sr-only">
             {sidebarOpen ? "Collapse sidebar" : "Open sidebar"}

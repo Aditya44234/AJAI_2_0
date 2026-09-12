@@ -27,11 +27,7 @@ export function PersonalitySelector() {
   return (
     <div className="px-3">
       
-      <label className="flex items-center gap-2 text-xs text-muted-foreground mb-2 px-1">
-          {/* <User  className="w-4 h-4" /> */}
-        {/* <Sparkles className="w-3 h-3" /> */}
-        AI Personality
-      </label>
+     
       <Select value={personality} onValueChange={(v) => setPersonality(v as Personality)} >
         <SelectTrigger className="w-full bg-sidebar-accent/50 border-sidebar-border cursor-pointer py-6  border-4 ">
            <User  className="w-4 h-4" />

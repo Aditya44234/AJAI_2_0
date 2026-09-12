@@ -12,13 +12,13 @@ import {
   LogIn,
   LogOut,
   MoreVertical,
-  PanelLeftClose,
   Pin,
   PinIcon,
   PinOff,
   Plus,
   Trash2,
-  X
+  X,
+  MessageSquarePlus
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PersonalitySelector } from "./PersonalitySelector";
@@ -70,7 +70,8 @@ export function Sidebar() {
   const sidebarContent = (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 ">
+      
+      <div className="flex items-center justify-between p-4  ">
         <div className="flex items-center gap-2">
           <div
             className="w-20 h-15 rounded-lg  flex items-center justify-center cursor-pointer"
@@ -104,19 +105,58 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="p-3 cursor-pointer ">
+      <div className="p-3">
         <Button
           onClick={handleNewChat}
-          className="w-full flex  justify-between  gap-2 cursor-pointer border-4"
           variant="outline"
+          className="
+      group
+      w-full
+      h-11
+      justify-start
+      gap-3
+      rounded-xl
+      border-white/10
+      bg-white/[0.03]
+      px-4
+      text-sm
+      font-medium
+      text-foreground/80
+      shadow-sm
+      transition-all
+      duration-200
+      hover:border-white/15
+      hover:bg-white/[0.08]
+      hover:text-foreground
+      hover:shadow-md
+      active:scale-[0.98]
+      cursor-pointer
+    "
         >
-          <Plus className="w-4 h-4" />
-          New Chat
-          <Plus className="w-4 h-4" />
+          <span
+            className="
+        flex
+        h-7
+        w-7
+        items-center
+        justify-center
+        rounded-lg
+        bg-white/[0.08]
+        text-muted-foreground
+        transition-colors
+        duration-200
+        group-hover:bg-white/[0.12]
+        group-hover:text-foreground
+      "
+          >
+            <MessageSquarePlus className="h-4 w-4" strokeWidth={2} />
+          </span>
+
+          <span>New Chat</span>
         </Button>
       </div>
 
-      <PersonalitySelector />
+      {/* <PersonalitySelector /> */}
 
       <div className="flex-1 overflow-hidden mt-4">
         <div className=" flex px-4 mb-2 mt-2">
@@ -155,15 +195,15 @@ export function Sidebar() {
                   <div
                     key={chat.chatId}
                     className={cn(
-                      "relative w-full  rounded-lg border-t-4   bg-card transition-all overflow-visible flex items-center justify-between  cursor-pointer  hover:bg-sidebar-accent  ",
+                      "group relative w-full rounded-lg  bg-card transition-all overflow-visible flex items-center justify-between cursor-pointer hover:bg-sidebar-accent",
                       currentChatId === chat.chatId
                         ? "bg-sidebar-accent"
                         : "bg-sidebar",
                     )}
                     onClick={() => handleChatClick(chat.chatId)}
                   >
-                    <div className="flex ">
-                      <button className="flex-1 flex  items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
+                    <div className="flex">
+                      <button className="flex-1 flex items-center gap-2 px-2 py-5 text-left rounded-lg cursor-pointer">
                         <div className="min-w-0 flex">
                           <p className="font-medium truncate text-sidebar-foreground">
                             {chat.title}
@@ -172,7 +212,7 @@ export function Sidebar() {
                       </button>
                     </div>
 
-                    <div className="flex justify-center items-center    ">
+                    <div className="flex justify-center items-center">
                       {chat.pinned && (
                         <PinIcon className="w-4 h-4 text-muted-foreground" />
                       )}
@@ -184,10 +224,14 @@ export function Sidebar() {
                             openMenuId === chat.chatId ? null : chat.chatId,
                           );
                         }}
-                        className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground  cursor-pointer"
+                        className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
                         aria-label="Open chat actions"
                       >
-                        <MoreVertical className="w-4 h-4 text-muted-foreground " />
+                        <MoreVertical
+                          className={cn(
+                            "w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity",
+                          )}
+                        />
                       </button>
                     </div>
 
@@ -199,7 +243,7 @@ export function Sidebar() {
                             setOpenMenuId(null);
                             void togglePinChat(chat.chatId, !chat.pinned);
                           }}
-                          className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-foreground hover:bg-muted  cursor-pointer"
+                          className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-foreground hover:bg-muted cursor-pointer"
                         >
                           {chat.pinned ? (
                             <PinOff className="w-3.5 h-3.5 cursor-pointer" />
@@ -214,7 +258,7 @@ export function Sidebar() {
                             setOpenMenuId(null);
                             void deleteChat(chat.chatId);
                           }}
-                          className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10  cursor-pointer"
+                          className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           Delete chat
